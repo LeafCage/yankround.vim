@@ -3,7 +3,7 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_cacherounder = {}
 function! s:new_cacherounder(keybind) "{{{
-  let _ = {'pos': getpos('.'), 'idx': 0, 'keybind': a:keybind}
+  let _ = {'pos': getpos('.'), 'idx': 0, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount}
   call extend(_, s:_cacherounder)
   return _
 endfunction
@@ -31,7 +31,7 @@ function! s:_cacherounder.round_cache(incdec) "{{{
     let entry = g:yankcache#cache[self.idx]
     call setreg('"', entry[1], entry[0])
     silent undo
-    silent exe 'norm! ""'. self.keybind
+    silent exe 'norm!' self.count. '""'. self.keybind
     ec 'yankcache: ('. (self.idx+1). '/'. cachelen. ')'
   finally
     let self.pos = getpos('.')
