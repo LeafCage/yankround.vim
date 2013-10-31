@@ -1,0 +1,136 @@
+*yankcache.txt*	レジスタの履歴を取得・再利用する。
+
+Author  : LeafCage <leafcage+vim @ gmail.com>
+License : MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+==============================================================================
+目次						*yankcache-contents*
+
+概要				|yankcache-introduction|
+使い方				|yankcache-usage|
+インターフェイス		|yankcache-interface|
+  変数				  |yankcache-variables|
+  コマンド			  |yankcache-commands|
+  キーマッピング		  |yankcache-key-mappings|
+  関数				  |yankcache-functions|
+
+
+==============================================================================
+概要						*yankcache-introduction*
+
+*yankcache* はレジスタの履歴を取得し、再利用するためのVimプラグインです。
+|YankRing.vim|と似た役割・操作性を持ちますが、機能が劣る代わりに副作用を少なく
+しています。|ctrlp.vim|の機能を使う場合は|ctrlp.vim|をインストールして下さい。
+
+最新版:
+https://github.com/LeafCage/yankcache.vim
+
+
+==============================================================================
+使い方						*yankcache-usage*
+
+* YankRing.vim的な利用法 ~
+  まず以下の設定をしてください。 >
+	nmap p <Plug>(yankcache-p)
+	nmap P <Plug>(yankcache-P)
+	nmap <C-p> <Plug>(yankcache-prev)
+	nmap <C-n> <Plug>(yankcache-next)
+< p でテキストの貼り付けを行った後、<C-p><C-n>で貼り付けたテキストを前の履歴・
+  次の履歴に置き換えます。カーソルを動かすと置き換えは確定されます。
+
+
+* ctrlp.vimによる履歴の閲覧 ~
+  |:CtrlPYankCache|コマンドを実行してください。
+  レジスタ履歴が一覧表示されます。履歴を選択後、
+  - <CR>で、その履歴をカーソル位置に挿入します。
+  - <C-x>(<C-s>)で、無名レジスタ " にその履歴をセットします。
+  - <C-t>で、その履歴を履歴から削除します。
+
+
+==============================================================================
+インターフェイス				*yankcache-interface*
+
+------------------------------------------------------------------------------
+変数						*yankcache-variables*
+
+g:yankcache_dir					*g:yankcache_dir*
+	既定値: "~/.cache/yankcache"
+	このディレクトリ以下に履歴を永続化したファイルが作られる。
+
+
+g:yankcache_max_history				*g:yankcache_max_history*
+	既定値: 30
+	取得する履歴の限界値。
+
+
+------------------------------------------------------------------------------
+コマンド					*yankcache-commands*
+
+:CtrlPYankCache					*:CtrlPYankCache*
+	|ctrlp.vim|のyankcache拡張を呼ぶ。|yankcache-usage|参照。
+
+
+------------------------------------------------------------------------------
+キーマッピング					*yankcache-key-mappings*
+
+|YankRing.vim|のような使い方をしたいのならキーマッピングは必須である。
+
+<Plug>(yankcache-p)				*<Plug>(yankcache-p)*
+	有効モード: ノーマル
+	通常の|p|の役割を果たす。この後、カーソルを動かすまで、
+	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効になる。
+
+
+<Plug>(yankcache-P)				*<Plug>(yankcache-P)*
+	有効モード: ノーマル
+	通常の|P|の役割を果たす。この後、カーソルを動かすまで、
+	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効になる。
+
+
+<Plug>(yankcache-prev)				*<Plug>(yankcache-prev)*
+	有効モード: ノーマル
+	|<Plug>(yankcache-p)|か|<Plug>(yankcache-P)|が先に行われていないと機能
+	しない。貼り付けたテキストを古い履歴のものに置き換える。
+	カーソルを動かすまで有効である。
+
+
+<Plug>(yankcache-next)				*<Plug>(yankcache-next)*
+	有効モード: ノーマル
+	|<Plug>(yankcache-p)|か|<Plug>(yankcache-P)|が先に行われていないと機能
+	しない。貼り付けたテキストを新しい履歴のものに置き換える。
+	カーソルを動かすまで有効である。
+
+
+------------------------------------------------------------------------------
+関数						*yankcache-functions*
+
+yankcache#is_active()				*yankcache#is_active*
+	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効なときに1が返る
+	。そうでなければ0。
+	<expr>を使ったマッピングで、yankcacheが有効でないときには別の動作をさ
+	せたいときに使う。
+	例: yankcacheが有効でないときには<C-p>で|ctrlp.vim|を呼ぶ。 >
+ nnoremap <silent><SID>(ctrlp) :<C-u>CtrlP<CR>
+ nmap <expr><C-p> yankcache#is_active() ? "\<Plug>(yankcache-prev)" : "<SID>(ctrlp)"
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:
