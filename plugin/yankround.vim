@@ -11,7 +11,7 @@ command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
 "=============================================================================
 
 let s:path = expand(g:yankround_dir). '/cache'
-let g:yankround#cache = has_key(g:, 'yankround#cache') ? g:yankround#cache : !filereadable(s:path) ? [] : map(readfile(s:path), 'eval(v:val)')
+let g:yankround#cache = has_key(g:, 'yankround#cache') ? g:yankround#cache : !filereadable(s:path) ? [] : readfile(s:path)
 unlet s:path
 let g:yankround#stop_autocmd = 0
 
@@ -21,10 +21,10 @@ aug yankround
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
 function! s:append_yankround() "{{{
-  if g:yankround#stop_autocmd || @" ==# get(g:yankround#cache, 0, ['', ''])[1] || @"=~'^.\?$'
+  if g:yankround#stop_autocmd || @" ==# substitute(get(g:yankround#cache, 0, ''), "^.\\d*\t", '', '') || @"=~'^.\?$'
     return
   end
-  call insert(g:yankround#cache, [getregtype('"'), @"])
+  call insert(g:yankround#cache, getregtype('"'). "\t". @")
   call s:new_dupliexcluder().filter(g:yankround#cache)
   if len(g:yankround#cache) > g:yankround_max_history
     call remove(g:yankround#cache, g:yankround_max_history, -1)

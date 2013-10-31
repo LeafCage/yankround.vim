@@ -28,8 +28,8 @@ function! s:_cacherounder.round_cache(incdec) "{{{
     let cachelen = len(g:yankround#cache)
     let self.idx += a:incdec
     let self.idx = self.idx>=cachelen ? 0 : self.idx<0 ? cachelen-1 : self.idx
-    let entry = g:yankround#cache[self.idx]
-    call setreg('"', entry[1], entry[0])
+    let entry = matchlist(g:yankround#cache[self.idx], "^\\(.\\d*\\)\t\\(.*\\)")
+    call setreg('"', entry[2], entry[1])
     silent undo
     silent exe 'norm!' self.count. '""'. self.keybind
     ec 'yankround: ('. (self.idx+1). '/'. cachelen. ')'
@@ -78,7 +78,7 @@ function! yankround#persistent() "{{{
   if !isdirectory(dir)
     call mkdir(dir, 'p')
   end
-  call writefile(map(g:yankround#cache, 'string(v:val)'), dir. '/cache')
+  call writefile(g:yankround#cache, dir. '/cache')
 endfunction
 "}}}
 

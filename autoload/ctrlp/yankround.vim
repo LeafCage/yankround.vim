@@ -3,7 +3,7 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:CTRLP_BUILTINS = ctrlp#getvar('g:ctrlp_builtins')
 "======================================
-let s:ctrlp_yankround_var = {'lname': 'yankround', 'sname': 'ynkc', 'typs': 'tabe', 'sort': 0}
+let s:ctrlp_yankround_var = {'lname': 'yankround', 'sname': 'ynkrd', 'typs': 'tabe', 'sort': 0}
 let s:ctrlp_yankround_var.init = 'ctrlp#yankround#init()'
 let s:ctrlp_yankround_var.accept = 'ctrlp#yankround#accept'
 let g:ctrlp_ext_vars = add(get(g:, 'ctrlp_ext_vars', []), s:ctrlp_yankround_var)
@@ -14,20 +14,21 @@ function! ctrlp#yankround#id() "{{{
 endfunction
 "}}}
 function! ctrlp#yankround#init() "{{{
-  return map(copy(g:yankround#cache), 's:_change_regmodechar(v:val[0]). "\t". strtrans(v:val[1])')
+  return map(copy(g:yankround#cache), 's:_cache_to_ctrlpline(v:val)')
 endfunction
 "}}}
 function! ctrlp#yankround#accept(action, str) "{{{
   call ctrlp#exit()
   let str = a:str
-  let strlist = map(copy(g:yankround#cache), 's:_change_regmodechar(v:val[0]). "\t". strtrans(v:val[1])')
+  let strlist = map(copy(g:yankround#cache), 's:_cache_to_ctrlpline(v:val)')
   let idx = index(strlist, str)
   if a:action=='t'
     call remove(g:yankround#cache, idx)
     call ctrlp#init(ctrlp#yankround#id())
     return
   end
-  call setreg('"', g:yankround#cache[idx][1], g:yankround#cache[idx][0])
+  let entry = matchlist(g:yankround#cache[idx], "^\\(.\\d*\\)\t\\(.*\\)")
+  call setreg('"', entry[2], entry[1])
   if a:action!='h'
     exe 'norm! ""'. (col('$')-col('.')<=1 ? 'p': 'P')
   end
@@ -36,6 +37,11 @@ endfunction
 unlet s:CTRLP_BUILTINS
 
 "======================================
+function! s:_cache_to_ctrlpline(str) "{{{
+  let entry = matchlist(a:str, "^\\(.\\d*\\)\t\\(.*\\)")
+  return s:_change_regmodechar(entry[1]). "\t". strtrans(entry[2])
+endfunction
+"}}}
 function! s:_change_regmodechar(char) "{{{
   return a:char==#'v' ? 'c' : a:char==#'V' ? 'l' : a:char
 endfunction
