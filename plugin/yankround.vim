@@ -45,12 +45,12 @@ function! s:_dupliexcluder.filter(list) "{{{
   return filter(a:list, 'self._seen(v:val)')
 endfunction
 "}}}
-function! s:_dupliexcluder._seen(val) "{{{
-  if has_key(self.seens, string(a:val))
+function! s:_dupliexcluder._seen(str) "{{{
+  if has_key(self.seens, a:str)
     return
   end
-  if !empty(a:val)
-    let self.seens[string(a:val)] = 1
+  if a:str!=''
+    let self.seens[a:str] = 1
   end
   return 1
 endfunction
