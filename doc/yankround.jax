@@ -1,4 +1,4 @@
-*yankcache.txt*	レジスタの履歴を取得・再利用する。
+*yankround.txt*	レジスタの履歴を取得・再利用する。
 
 Author  : LeafCage <leafcage+vim @ gmail.com>
 License : MIT license  {{{
@@ -22,43 +22,43 @@ License : MIT license  {{{
 }}}
 
 ==============================================================================
-目次						*yankcache-contents*
+目次						*yankround-contents*
 
-概要				|yankcache-introduction|
-使い方				|yankcache-usage|
-インターフェイス		|yankcache-interface|
-  変数				  |yankcache-variables|
-  コマンド			  |yankcache-commands|
-  キーマッピング		  |yankcache-key-mappings|
-  関数				  |yankcache-functions|
+概要				|yankround-introduction|
+使い方				|yankround-usage|
+インターフェイス		|yankround-interface|
+  変数				  |yankround-variables|
+  コマンド			  |yankround-commands|
+  キーマッピング		  |yankround-key-mappings|
+  関数				  |yankround-functions|
 
 
 ==============================================================================
-概要						*yankcache-introduction*
+概要						*yankround-introduction*
 
-*yankcache* はレジスタの履歴を取得し、再利用するためのVimプラグインです。
+*yankround* はレジスタの履歴を取得し、再利用するためのVimプラグインです。
 |YankRing.vim|と似た役割・操作性を持ちますが、機能が劣る代わりに副作用を少なく
 しています。|ctrlp.vim|の機能を使う場合は|ctrlp.vim|をインストールして下さい。
 
 最新版:
-https://github.com/LeafCage/yankcache.vim
+https://github.com/LeafCage/yankround.vim
 
 
 ==============================================================================
-使い方						*yankcache-usage*
+使い方						*yankround-usage*
 
 * YankRing.vim的な利用法 ~
   まず以下の設定をしてください。 >
-	nmap p <Plug>(yankcache-p)
-	nmap P <Plug>(yankcache-P)
-	nmap <C-p> <Plug>(yankcache-prev)
-	nmap <C-n> <Plug>(yankcache-next)
+	nmap p <Plug>(yankround-p)
+	nmap P <Plug>(yankround-P)
+	nmap <C-p> <Plug>(yankround-prev)
+	nmap <C-n> <Plug>(yankround-next)
 < p でテキストの貼り付けを行った後、<C-p><C-n>で貼り付けたテキストを前の履歴・
   次の履歴に置き換えます。カーソルを動かすと置き換えは確定されます。
 
 
 * ctrlp.vimによる履歴の閲覧 ~
-  |:CtrlPYankCache|コマンドを実行してください。
+  |:CtrlPYankRound|コマンドを実行してください。
   レジスタ履歴が一覧表示されます。履歴を選択後、
   - <CR>で、その履歴をカーソル位置に挿入します。
   - <C-x>(<C-s>)で、無名レジスタ " にその履歴をセットします。
@@ -66,70 +66,70 @@ https://github.com/LeafCage/yankcache.vim
 
 
 ==============================================================================
-インターフェイス				*yankcache-interface*
+インターフェイス				*yankround-interface*
 
 ------------------------------------------------------------------------------
-変数						*yankcache-variables*
+変数						*yankround-variables*
 
-g:yankcache_dir					*g:yankcache_dir*
-	既定値: "~/.cache/yankcache"
+g:yankround_dir					*g:yankround_dir*
+	既定値: "~/.cache/yankround"
 	このディレクトリ以下に履歴を永続化したファイルが作られる。
 
 
-g:yankcache_max_history				*g:yankcache_max_history*
+g:yankround_max_history				*g:yankround_max_history*
 	既定値: 30
 	取得する履歴の限界値。
 
 
 ------------------------------------------------------------------------------
-コマンド					*yankcache-commands*
+コマンド					*yankround-commands*
 
-:CtrlPYankCache					*:CtrlPYankCache*
-	|ctrlp.vim|のyankcache拡張を呼ぶ。|yankcache-usage|参照。
+:CtrlPYankRound					*:CtrlPYankRound*
+	|ctrlp.vim|のyankround拡張を呼ぶ。|yankround-usage|参照。
 
 
 ------------------------------------------------------------------------------
-キーマッピング					*yankcache-key-mappings*
+キーマッピング					*yankround-key-mappings*
 
 |YankRing.vim|のような使い方をしたいのならキーマッピングは必須である。
 
-<Plug>(yankcache-p)				*<Plug>(yankcache-p)*
+<Plug>(yankround-p)				*<Plug>(yankround-p)*
 	有効モード: ノーマル
 	通常の|p|の役割を果たす。この後、カーソルを動かすまで、
-	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効になる。
+	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
 
 
-<Plug>(yankcache-P)				*<Plug>(yankcache-P)*
+<Plug>(yankround-P)				*<Plug>(yankround-P)*
 	有効モード: ノーマル
 	通常の|P|の役割を果たす。この後、カーソルを動かすまで、
-	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効になる。
+	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
 
 
-<Plug>(yankcache-prev)				*<Plug>(yankcache-prev)*
+<Plug>(yankround-prev)				*<Plug>(yankround-prev)*
 	有効モード: ノーマル
-	|<Plug>(yankcache-p)|か|<Plug>(yankcache-P)|が先に行われていないと機能
+	|<Plug>(yankround-p)|か|<Plug>(yankround-P)|が先に行われていないと機能
 	しない。貼り付けたテキストを古い履歴のものに置き換える。
 	カーソルを動かすまで有効である。
 
 
-<Plug>(yankcache-next)				*<Plug>(yankcache-next)*
+<Plug>(yankround-next)				*<Plug>(yankround-next)*
 	有効モード: ノーマル
-	|<Plug>(yankcache-p)|か|<Plug>(yankcache-P)|が先に行われていないと機能
+	|<Plug>(yankround-p)|か|<Plug>(yankround-P)|が先に行われていないと機能
 	しない。貼り付けたテキストを新しい履歴のものに置き換える。
 	カーソルを動かすまで有効である。
 
 
 ------------------------------------------------------------------------------
-関数						*yankcache-functions*
+関数						*yankround-functions*
 
-yankcache#is_active()				*yankcache#is_active*
-	|<Plug>(yankcache-prev)||<Plug>(yankcache-next)|が有効なときに1が返る
+yankround#is_active()				*yankround#is_active*
+	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効なときに1が返る
 	。そうでなければ0。
-	<expr>を使ったマッピングで、yankcacheが有効でないときには別の動作をさ
+	<expr>を使ったマッピングで、yankroundが有効でないときには別の動作をさ
 	せたいときに使う。
-	例: yankcacheが有効でないときには<C-p>で|ctrlp.vim|を呼ぶ。 >
+	例: yankroundが有効でないときには<C-p>で|ctrlp.vim|を呼ぶ。 >
  nnoremap <silent><SID>(ctrlp) :<C-u>CtrlP<CR>
- nmap <expr><C-p> yankcache#is_active() ? "\<Plug>(yankcache-prev)" : "<SID>(ctrlp)"
+ nmap <expr><C-p> yankround#is_active() ? "\<Plug>(yankround-prev)" : "<SID>(ctrlp)"
 
 
 ==============================================================================
