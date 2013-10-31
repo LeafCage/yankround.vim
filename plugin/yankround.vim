@@ -27,7 +27,7 @@ function! s:append_yankround() "{{{
   call insert(g:yankround#cache, [getregtype('"'), @"])
   call s:new_dupliexcluder().filter(g:yankround#cache)
   if len(g:yankround#cache) > g:yankround_max_history
-    call remove(g:yankround#cache, g:yankround_max_history-1, -1)
+    call remove(g:yankround#cache, g:yankround_max_history, -1)
   end
 endfunction
 "}}}
