@@ -27,8 +27,8 @@ function! ctrlp#yankround#accept(action, str) "{{{
     call ctrlp#init(ctrlp#yankround#id())
     return
   end
-  let entry = matchlist(g:yankround#cache[idx], "^\\(.\\d*\\)\t\\(.*\\)")
-  call setreg('"', entry[2], entry[1])
+  let [str, regtype] = yankround#_get_cache_and_regtype(idx)
+  call setreg('"', str, regtype)
   if a:action!='h'
     exe 'norm! ""'. (col('$')-col('.')<=1 ? 'p': 'P')
   end
