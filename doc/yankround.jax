@@ -37,8 +37,9 @@ License : MIT license  {{{
 概要						*yankround-introduction*
 
 *yankround* はレジスタの履歴を取得し、再利用するためのVimプラグインです。
-|YankRing.vim|と似た役割・操作性を持ちますが、機能が劣る代わりに副作用を少なく
-しています。|ctrlp.vim|の機能を使う場合は|ctrlp.vim|をインストールして下さい。
+|YankRing.vim|と似た役割・操作性を持ちますが、キーマッピング置き換えによる副作
+用を少なくしています。
+|ctrlp.vim|の機能を使う場合は|ctrlp.vim|をインストールして下さい。
 
 最新版:
 https://github.com/LeafCage/yankround.vim
@@ -105,17 +106,31 @@ g:yankround_max_history				*g:yankround_max_history*
 	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
 
 
+<Plug>(yankround-gp)				*<Plug>(yankround-gp)*
+	有効モード: ノーマル
+	通常の|gp|の役割を果たす。この後、カーソルを動かすまで、
+	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+
+
+<Plug>(yankround-gP)				*<Plug>(yankround-gP)*
+	有効モード: ノーマル
+	通常の|gP|の役割を果たす。この後、カーソルを動かすまで、
+	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+
+
 <Plug>(yankround-prev)				*<Plug>(yankround-prev)*
 	有効モード: ノーマル
-	|<Plug>(yankround-p)|か|<Plug>(yankround-P)|が先に行われていないと機能
-	しない。貼り付けたテキストを古い履歴のものに置き換える。
+	|<Plug>(yankround-p)| |<Plug>(yankround-P)| |<Plug>(yankround-gp)|
+	|<Plug>(yankround-gP)|のいずれかが先に行われていないと機能しない。
+	貼り付けたテキストを古い履歴のものに置き換える。
 	カーソルを動かすまで有効である。
 
 
 <Plug>(yankround-next)				*<Plug>(yankround-next)*
 	有効モード: ノーマル
-	|<Plug>(yankround-p)|か|<Plug>(yankround-P)|が先に行われていないと機能
-	しない。貼り付けたテキストを新しい履歴のものに置き換える。
+	|<Plug>(yankround-p)| |<Plug>(yankround-P)| |<Plug>(yankround-gp)|
+	|<Plug>(yankround-gP)|のいずれかが先に行われていないと機能しない。
+	貼り付けたテキストを新しい履歴のものに置き換える。
 	カーソルを動かすまで有効である。
 
 

@@ -16,14 +16,14 @@ function! s:_cacherounder.detect_cursmoved() "{{{
   aug yankround_rounder
     autocmd!
   aug END
-  let g:yankround#stop_autocmd = 0
+  let g:yankround#stop_caching = 0
 endfunction
 "}}}
 function! s:_cacherounder.round_cache(incdec) "{{{
   if g:yankround#cache==[]
     return
   end
-  let g:yankround#stop_autocmd = 1
+  let g:yankround#stop_caching = 1
   try
     let cachelen = len(g:yankround#cache)
     let self.idx += a:incdec

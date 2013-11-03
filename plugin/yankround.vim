@@ -5,6 +5,8 @@ let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
 "======================================
 nnoremap <silent><Plug>(yankround-p)    p:<C-u>call yankround#init_rounder('p')<CR>
 nnoremap <silent><Plug>(yankround-P)    P:<C-u>call yankround#init_rounder('P')<CR>
+nnoremap <silent><Plug>(yankround-gp)    gp:<C-u>call yankround#init_rounder('gp')<CR>
+nnoremap <silent><Plug>(yankround-gP)    gP:<C-u>call yankround#init_rounder('gP')<CR>
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
 command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
@@ -13,15 +15,15 @@ command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
 let s:path = expand(g:yankround_dir). '/cache'
 let g:yankround#cache = has_key(g:, 'yankround#cache') ? g:yankround#cache : !filereadable(s:path) ? [] : readfile(s:path)
 unlet s:path
-let g:yankround#stop_autocmd = 0
+let g:yankround#stop_caching = 0
 
 aug yankround
   autocmd!
-  autocmd CursorMoved *   call s:append_yankround()
+  autocmd CursorMoved *   call s:append_yankcache()
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
-function! s:append_yankround() "{{{
-  if g:yankround#stop_autocmd || @" ==# substitute(get(g:yankround#cache, 0, ''), "^.\\d*\t", '', '') || @"=~'^.\?$'
+function! s:append_yankcache() "{{{
+  if g:yankround#stop_caching || @" ==# substitute(get(g:yankround#cache, 0, ''), "^.\\d*\t", '', '') || @"=~'^.\?$'
     return
   end
   call insert(g:yankround#cache, getregtype('"'). "\t". @")
