@@ -3,7 +3,7 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount}
+  let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount, 'changedtick': b:changedtick}
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -12,16 +12,19 @@ function! s:_rounder.detect_cursmoved() "{{{
   if getpos('.')==self.pos
     return
   end
-  unlet s:rounder
-  aug yankround_rounder
-    autocmd!
-  aug END
-  let g:yankround#stop_caching = 0
+  call s:_release_rounder()
+endfunction
+"}}}
+function! s:_rounder.is_valid() "{{{
+  if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
+    return 1
+  end
+  call s:_release_rounder()
 endfunction
 "}}}
 function! s:_rounder.round_cache(incdec) "{{{
   let self.cachelen = len(g:yankround#cache)
-  if self.cachelen == 0
+  if !self.is_valid()
     return
   end
   let g:yankround#stop_caching = 1
@@ -32,6 +35,7 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   let self.pos = getpos('.')
+  let self.changedtick = b:changedtick
 endfunction
 "}}}
 function! s:_rounder._round_idx(incdec) "{{{
@@ -44,6 +48,14 @@ function! s:_rounder._round_idx(incdec) "{{{
   end
   let self.idx += a:incdec
   return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
+endfunction
+"}}}
+function! s:_release_rounder() "{{{
+  unlet s:rounder
+  aug yankround_rounder
+    autocmd!
+  aug END
+  let g:yankround#stop_caching = 0
 endfunction
 "}}}
 
@@ -73,7 +85,7 @@ endfunction
 "}}}
 
 function! yankround#is_active() "{{{
-  return has_key(s:, 'rounder')
+  return has_key(s:, 'rounder') && s:rounder.is_valid()
 endfunction
 "}}}
 
