@@ -3,9 +3,15 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount, 'changedtick': b:changedtick}
+  let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount,
+    \ 'changedtick': b:changedtick, 'match_ids': []}
   call extend(_, s:_rounder)
   return _
+endfunction
+"}}}
+function! s:_rounder.init_highlight() "{{{
+  let pat = '.\%>''\[.*\%<''\]..'
+  call add(self.match_ids, matchadd(g:yankround_highlight_groupname, pat))
 endfunction
 "}}}
 function! s:_rounder.detect_cursmoved() "{{{
@@ -50,7 +56,9 @@ function! s:_rounder._round_idx(incdec) "{{{
   return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
 endfunction
 "}}}
+
 function! s:_release_rounder() "{{{
+  call s:rounder._clear_highlight()
   unlet s:rounder
   aug yankround_rounder
     autocmd!
@@ -58,11 +66,24 @@ function! s:_release_rounder() "{{{
   let g:yankround#stop_caching = 0
 endfunction
 "}}}
+function! s:_rounder._clear_highlight() "{{{
+  for id in self.match_ids
+    try
+      call matchdelete(id)
+    catch
+    endtry
+  endfor
+endfunction
+"}}}
+
 
 "=============================================================================
 "Main
 function! yankround#init_rounder(keybind) "{{{
   let s:rounder = s:new_rounder(a:keybind)
+  if g:yankround_use_highlight
+    call s:rounder.init_highlight()
+  end
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
