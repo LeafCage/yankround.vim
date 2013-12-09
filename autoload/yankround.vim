@@ -4,10 +4,10 @@ let s:save_cpo = &cpo| set cpo&vim
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
   let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount,
-    \ 'changedtick': b:changedtick, 'match_id': 0, 'save_regtype': getregtype('"')}
+    \ 'changedtick': b:changedtick, 'match_id': 0}
   call extend(_, s:_rounder)
   if g:yankround_use_region_hl
-    call _.region_hl(_.save_regtype)
+    call _.region_hl(getregtype('"'))
   end
   return _
 endfunction
@@ -53,7 +53,6 @@ function! s:_rounder.round_cache(incdec) "{{{
     call matchdelete(self.match_id)
     call self.region_hl(regtype)
   end
-  let self.save_regtype = regtype
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
 endfunction
