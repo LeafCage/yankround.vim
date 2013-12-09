@@ -4,14 +4,23 @@ let s:save_cpo = &cpo| set cpo&vim
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
   let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount,
-    \ 'changedtick': b:changedtick, 'match_ids': []}
+    \ 'changedtick': b:changedtick, 'match_id': 0, 'save_regtype': getregtype('"')}
   call extend(_, s:_rounder)
+  if g:yankround_use_region_hl
+    call _.region_hl(_.save_regtype)
+  end
   return _
 endfunction
 "}}}
-function! s:_rounder.init_region_hl() "{{{
-  let pat = '.\%>''\[.*\%<''\]..'
-  call add(self.match_ids, matchadd(g:yankround_region_hl_groupname, pat))
+function! s:_rounder.region_hl(regtype) "{{{
+  if a:regtype[0]==''
+    let [sl, sc] = [line("'["), col("'[")]
+    let [el, ec] = [line("']"), col("']")]
+    let pat = printf('\v\c%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1)
+  else
+    let pat = '.\%>''\[.*\%<''\]..'
+  end
+  let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
 endfunction
 "}}}
 function! s:_rounder.detect_cursmoved() "{{{
@@ -40,6 +49,11 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent undo
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
+  if g:yankround_use_region_hl
+    call matchdelete(self.match_id)
+    call self.region_hl(regtype)
+  end
+  let self.save_regtype = regtype
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
 endfunction
@@ -58,7 +72,7 @@ endfunction
 "}}}
 
 function! s:_release_rounder() "{{{
-  call s:rounder._clear_highlight()
+  call s:rounder._clear_region_hl()
   unlet s:rounder
   aug yankround_rounder
     autocmd!
@@ -66,13 +80,10 @@ function! s:_release_rounder() "{{{
   let g:yankround#stop_caching = 0
 endfunction
 "}}}
-function! s:_rounder._clear_highlight() "{{{
-  for id in self.match_ids
-    try
-      call matchdelete(id)
-    catch
-    endtry
-  endfor
+function! s:_rounder._clear_region_hl() "{{{
+  if self.match_id
+    call matchdelete(self.match_id)
+  end
 endfunction
 "}}}
 
@@ -81,9 +92,6 @@ endfunction
 "Main
 function! yankround#init_rounder(keybind) "{{{
   let s:rounder = s:new_rounder(a:keybind)
-  if g:yankround_use_region_hl
-    call s:rounder.init_region_hl()
-  end
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()

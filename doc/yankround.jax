@@ -86,14 +86,14 @@ g:yankround_use_region_hl			*g:yankround_use_region_hl*
 	既定値: 0
 	非0 だと、yankroundによって貼り付けた、置き換え可能な文字列が
 	|g:yankround_region_hl_groupname|によってハイライトされる。カーソルを
-	動かすまで有効である。現在、矩形選択には対応していない。
+	動かすまで有効である。
 
 
 g:yankround_region_hl_groupname		*g:yankround_region_hl_groupname*
 	既定値: "Visual"
 	|g:yankround_use_region_hl|が 非0 のとき、このグループ名のハイライトに
 	よって貼り付けた文字列がハイライトされる。カーソルを動かすまで有効であ
-	る。現在、矩形選択には対応していない。
+	る。
 
 
 ------------------------------------------------------------------------------
