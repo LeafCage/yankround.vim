@@ -13,7 +13,7 @@ function! s:new_rounder(keybind) "{{{
 endfunction
 "}}}
 function! s:_rounder.region_hl(regtype) "{{{
-  if a:regtype[0]==''
+  if a:regtype[0]=="\<C-v>"
     let [sl, sc] = [line("'["), col("'[")]
     let [el, ec] = [line("']"), col("']")]
     let pat = printf('\v\c%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1)
