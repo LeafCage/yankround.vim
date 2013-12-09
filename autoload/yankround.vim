@@ -9,9 +9,9 @@ function! s:new_rounder(keybind) "{{{
   return _
 endfunction
 "}}}
-function! s:_rounder.init_highlight() "{{{
+function! s:_rounder.init_region_hl() "{{{
   let pat = '.\%>''\[.*\%<''\]..'
-  call add(self.match_ids, matchadd(g:yankround_highlight_groupname, pat))
+  call add(self.match_ids, matchadd(g:yankround_region_hl_groupname, pat))
 endfunction
 "}}}
 function! s:_rounder.detect_cursmoved() "{{{
@@ -81,8 +81,8 @@ endfunction
 "Main
 function! yankround#init_rounder(keybind) "{{{
   let s:rounder = s:new_rounder(a:keybind)
-  if g:yankround_use_highlight
-    call s:rounder.init_highlight()
+  if g:yankround_use_region_hl
+    call s:rounder.init_region_hl()
   end
   aug yankround_rounder
     autocmd!
