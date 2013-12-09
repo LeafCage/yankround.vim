@@ -14,6 +14,7 @@ function! s:_rounder.detect_cursmoved() "{{{
   if getpos('.')==self.pos
     return
   end
+  call s:_rounder.clear_highlight()
   call s:_release_rounder()
 endfunction
 "}}}
@@ -39,8 +40,6 @@ function! s:_rounder.round_cache(incdec) "{{{
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
-
-  call self.highlight_region()
 endfunction
 "}}}
 
@@ -91,6 +90,7 @@ function! yankround#init_rounder(keybind) "{{{
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
   aug END
+  call s:rounder.highlight_region()
 endfunction
 "}}}
 function! yankround#prev() "{{{
@@ -129,11 +129,6 @@ endfunction
 function! yankround#_get_cache_and_regtype(idx) "{{{
   let ret = matchlist(g:yankround#cache[a:idx], '^\(.\d*\)\t\(.*\)')
   return [ret[2], ret[1]]
-endfunction
-"}}}
-
-function! yankround#clear_highlight() "{{{
-  call s:_rounder.clear_highlight()
 endfunction
 "}}}
 
