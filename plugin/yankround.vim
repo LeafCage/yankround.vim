@@ -2,6 +2,8 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let g:yankround_dir = get(g:, 'yankround_dir', '~/.cache/yankround')
 let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
+let g:yankround_use_highlight = get(g:, 'yankround_use_highlight', 0)
+let g:yankround_highlight_groupname = get(g:, 'yankround_highlight_groupname', 'Visual')
 "======================================
 nnoremap <silent><Plug>(yankround-p)    p:<C-u>call yankround#init_rounder('p')<CR>
 nnoremap <silent><Plug>(yankround-P)    P:<C-u>call yankround#init_rounder('P')<CR>

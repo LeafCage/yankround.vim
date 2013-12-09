@@ -82,6 +82,20 @@ g:yankround_max_history				*g:yankround_max_history*
 	取得する履歴の限界値。
 
 
+g:yankround_use_highlight			*g:yankround_use_highlight*
+	既定値: 0
+	非0 だと、yankroundによって貼り付けた、置き換え可能な文字列が
+	|g:yankround_highlight_groupname|によってハイライトされる。カーソルを
+	動かすまで有効である。現在、矩形選択には対応していない。
+
+
+g:yankround_highlight_groupname		*g:yankround_highlight_groupname*
+	既定値: "Visual"
+	|g:yankround_use_highlight|が 非0 のとき、このグループ名のハイライトに
+	よって貼り付けた文字列がハイライトされる。カーソルを動かすまで有効であ
+	る。現在、矩形選択には対応していない。
+
+
 ------------------------------------------------------------------------------
 コマンド					*yankround-commands*
 

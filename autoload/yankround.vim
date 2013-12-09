@@ -11,7 +11,7 @@ endfunction
 "}}}
 function! s:_rounder.init_highlight() "{{{
   let pat = '.\%>''\[.*\%<''\]..'
-  call add(self.match_ids, matchadd('Visual', pat))
+  call add(self.match_ids, matchadd(g:yankround_highlight_groupname, pat))
 endfunction
 "}}}
 function! s:_rounder.detect_cursmoved() "{{{
@@ -81,7 +81,9 @@ endfunction
 "Main
 function! yankround#init_rounder(keybind) "{{{
   let s:rounder = s:new_rounder(a:keybind)
-  call s:rounder.init_highlight()
+  if g:yankround_use_highlight
+    call s:rounder.init_highlight()
+  end
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
