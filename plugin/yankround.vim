@@ -23,6 +23,7 @@ aug yankround
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
 function! s:append_yankcache() "{{{
+  call yankround#clear_highlight()
   if g:yankround#stop_caching || @" ==# substitute(get(g:yankround#cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
     return
   end
