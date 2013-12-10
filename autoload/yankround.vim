@@ -1,9 +1,9 @@
 if exists('s:save_cpo')| finish| endif
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
-let s:_rounder = {}
+let s:_rounder = {'match_id': 0}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0}
+  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'stop': 0}
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -11,7 +11,10 @@ endfunction
 function! s:_rounder.activate() "{{{
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
-  if g:yankround_use_region_hl
+  let self.using_region_hl = g:yankround_use_region_hl
+  let t:yankround_anchor = 1
+  let w:yankround_anchor = 1
+  if self.using_region_hl
     call self._region_hl(getregtype(self.register))
   end
   aug yankround_rounder
@@ -28,21 +31,28 @@ function! s:_rounder._region_hl(regtype) "{{{
   else
     let pat = '.\%>''\[.*\%<''\]..'
   end
-  let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
+  if self.match_id
+    try| call matchdelete(self.match_id)| catch /E803/| endtry
+    call matchadd(g:yankround_region_hl_groupname, pat, '', self.match_id)
+  else
+    let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
+    let s:_rounder.match_id = self.match_id
+  end
 endfunction
 "}}}
+
 function! s:_rounder.detect_cursmoved() "{{{
   if getpos('.')==self.pos
     return
   end
-  call s:_release_rounder()
+  call s:rounder.destroy()
 endfunction
 "}}}
 function! s:_rounder.is_valid() "{{{
   if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
     return 1
   end
-  call s:_release_rounder()
+  call s:rounder.destroy()
 endfunction
 "}}}
 function! s:_rounder.round_cache(incdec) "{{{
@@ -57,8 +67,8 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent undo
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
-  if g:yankround_use_region_hl
-    call self._clear_region_hl()
+  if self.using_region_hl
+    call matchdelete(self.match_id)
     call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
@@ -78,8 +88,10 @@ function! s:_rounder._round_idx(incdec) "{{{
 endfunction
 "}}}
 
-function! s:_release_rounder() "{{{
-  call s:rounder._clear_region_hl()
+function! s:_rounder.destroy() "{{{
+  if self.using_region_hl
+    call self._clear_region_hl()
+  end
   unlet s:rounder
   aug yankround_rounder
     autocmd!
@@ -88,9 +100,39 @@ function! s:_release_rounder() "{{{
 endfunction
 "}}}
 function! s:_rounder._clear_region_hl() "{{{
-  if self.match_id
-    call matchdelete(self.match_id)
+  let save_here = [tabpagenr(), winnr(), winsaveview()]
+  if !has_key(t:, 'yankround_anchor') && !s:_caught_tabpage_anchor()
+    return
   end
+  if !has_key(w:, 'yankround_anchor') && !s:_caught_win_anchor()
+    silent exe save_here[1].'wincmd w'
+    call winrestview(save_here[2])
+    return
+  end
+  call matchdelete(self.match_id)
+  unlet t:yankround_anchor w:yankround_anchor
+  silent exe 'tabn' save_here[0]
+  silent exe save_here[1].'wincmd w'
+  call winrestview(save_here[2])
+endfunction
+"}}}
+
+function! s:_caught_tabpage_anchor() "{{{
+  for tn in range(1, tabpagenr('$'))
+    if gettabvar(tn, 'yankround_anchor')!=''
+      silent exe 'tabn' tn
+      return 1
+    end
+  endfor
+endfunction
+"}}}
+function! s:_caught_win_anchor() "{{{
+  for wn in range(1, winnr('$'))
+    if getwinvar(wn, 'yankround_anchor')!=''
+      silent exe wn.'wincmd w'
+      return 1
+    end
+  endfor
 endfunction
 "}}}
 
@@ -99,7 +141,7 @@ endfunction
 "Main
 function! yankround#init(keybind) "{{{
   if has_key(s:, 'rounder')
-    call s:_release_rounder()
+    call s:rounder.destroy()
   end
   let s:rounder = s:new_rounder(a:keybind)
   return 'norm! "'. v:register. v:count1. a:keybind
