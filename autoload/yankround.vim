@@ -20,6 +20,8 @@ function! s:_rounder.activate() "{{{
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
+    autocmd CmdwinEnter *   let s:rounder.stop = 1
+    autocmd CmdwinLeave *   let s:rounder.stop = 0
   aug END
 endfunction
 "}}}
@@ -42,7 +44,7 @@ endfunction
 "}}}
 
 function! s:_rounder.detect_cursmoved() "{{{
-  if getpos('.')==self.pos
+  if self.stop || getpos('.')==self.pos
     return
   end
   call s:rounder.destroy()
