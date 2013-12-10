@@ -3,16 +3,24 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'pos': getpos('.'), 'idx': -1, 'keybind': a:keybind, 'count': v:prevcount==0 ? 1 : v:prevcount,
-    \ 'changedtick': b:changedtick, 'match_id': 0}
+  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0}
   call extend(_, s:_rounder)
-  if g:yankround_use_region_hl
-    call _.region_hl(getregtype())
-  end
   return _
 endfunction
 "}}}
-function! s:_rounder.region_hl(regtype) "{{{
+function! s:_rounder.activate() "{{{
+  let self.pos = getpos('.')
+  let self.changedtick = b:changedtick
+  if g:yankround_use_region_hl
+    call self._region_hl(getregtype(self.register))
+  end
+  aug yankround_rounder
+    autocmd!
+    autocmd CursorMoved *   call s:rounder.detect_cursmoved()
+  aug END
+endfunction
+"}}}
+function! s:_rounder._region_hl(regtype) "{{{
   if a:regtype[0]=="\<C-v>"
     let [sl, sc] = [line("'["), col("'[")]
     let [el, ec] = [line("']"), col("']")]
@@ -50,8 +58,8 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   if g:yankround_use_region_hl
-    call matchdelete(self.match_id)
-    call self.region_hl(regtype)
+    call self._clear_region_hl()
+    call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
@@ -89,14 +97,19 @@ endfunction
 
 "=============================================================================
 "Main
-function! yankround#init_rounder(keybind) "{{{
+function! yankround#init(keybind) "{{{
+  if has_key(s:, 'rounder')
+    call s:_release_rounder()
+  end
   let s:rounder = s:new_rounder(a:keybind)
-  aug yankround_rounder
-    autocmd!
-    autocmd CursorMoved *   call s:rounder.detect_cursmoved()
-  aug END
+  return 'norm! "'. v:register. v:count1. a:keybind
 endfunction
 "}}}
+function! yankround#activate() "{{{
+  call s:rounder.activate()
+endfunction
+"}}}
+
 function! yankround#prev() "{{{
   if !has_key(s:, 'rounder')
     return

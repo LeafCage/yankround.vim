@@ -5,10 +5,10 @@ let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
 let g:yankround_use_region_hl = get(g:, 'yankround_use_region_hl', 0)
 let g:yankround_region_hl_groupname = get(g:, 'yankround_region_hl_groupname', 'Visual')
 "======================================
-nnoremap <silent><Plug>(yankround-p)    p:<C-u>call yankround#init_rounder('p')<CR>
-nnoremap <silent><Plug>(yankround-P)    P:<C-u>call yankround#init_rounder('P')<CR>
-nnoremap <silent><Plug>(yankround-gp)    gp:<C-u>call yankround#init_rounder('gp')<CR>
-nnoremap <silent><Plug>(yankround-gP)    gP:<C-u>call yankround#init_rounder('gP')<CR>
+nnoremap <silent><Plug>(yankround-p)    :<C-u>exe yankround#init('p')<Bar>call yankround#activate()<CR>
+nnoremap <silent><Plug>(yankround-P)    :<C-u>exe yankround#init('P')<Bar>call yankround#activate()<CR>
+nnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp')<Bar>call yankround#activate()<CR>
+nnoremap <silent><Plug>(yankround-gP)    :<C-u>exe yankround#init('gP')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
 command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
