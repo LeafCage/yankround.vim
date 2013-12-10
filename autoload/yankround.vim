@@ -7,7 +7,7 @@ function! s:new_rounder(keybind) "{{{
     \ 'changedtick': b:changedtick, 'match_id': 0}
   call extend(_, s:_rounder)
   if g:yankround_use_region_hl
-    call _.region_hl(getregtype('"'))
+    call _.region_hl(getregtype())
   end
   return _
 endfunction
