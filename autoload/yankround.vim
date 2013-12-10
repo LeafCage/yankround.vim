@@ -67,7 +67,7 @@ endfunction
 "}}}
 function! s:_rounder._round_idx(incdec) "{{{
   if self.idx==-1
-    if @"!=yankround#_get_cache_and_regtype(0)[0]
+    if @"!=yankround#_get_cache_and_regtype(0)[0] || self.register!='"'
       return 0
     else
       let self.idx = 0
