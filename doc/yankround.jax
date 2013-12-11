@@ -90,10 +90,13 @@ g:yankround_use_region_hl			*g:yankround_use_region_hl*
 
 
 g:yankround_region_hl_groupname		*g:yankround_region_hl_groupname*
-	既定値: "Visual"
+	既定値: "YankRoundRegion"
 	|g:yankround_use_region_hl|が 非0 のとき、このグループ名のハイライトに
-	よって貼り付けた文字列がハイライトされる。カーソルを動かすまで有効であ
-	る。
+	よって貼り付けた文字列がハイライトされる。カーソルを動かすまで有効。
+	また、YankRoundRegionのハイライトを書き換えることで見た目を変更するこ
+	とも可能。
+	例: >
+	  autocmd ColorScheme * highlight YankRoundRegion guibg=Orange
 
 
 ------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ let s:save_cpo = &cpo| set cpo&vim
 let g:yankround_dir = get(g:, 'yankround_dir', '~/.cache/yankround')
 let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
 let g:yankround_use_region_hl = get(g:, 'yankround_use_region_hl', 0)
-let g:yankround_region_hl_groupname = get(g:, 'yankround_region_hl_groupname', 'Visual')
+let g:yankround_region_hl_groupname = get(g:, 'yankround_region_hl_groupname', 'YankRoundRegion')
 "======================================
 nnoremap <silent><Plug>(yankround-p)    :<C-u>exe yankround#init('p')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-P)    :<C-u>exe yankround#init('P')<Bar>call yankround#activate()<CR>
@@ -21,9 +21,18 @@ let g:yankround#stop_caching = 0
 
 aug yankround
   autocmd!
+  autocmd ColorScheme *   call s:define_region_hl()
   autocmd CursorMoved *   call s:append_yankcache()
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
+function! s:define_region_hl() "{{{
+  if &bg=='dark'
+    highlight default YankRoundRegion   guibg=Brown ctermbg=Brown term=reverse
+  else
+    highlight default YankRoundRegion   guibg=LightRed ctermbg=LightRed term=reverse
+  end
+endfunction
+"}}}
 function! s:append_yankcache() "{{{
   if g:yankround#stop_caching || @" ==# substitute(get(g:yankround#cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
     return
