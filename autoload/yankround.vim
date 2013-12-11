@@ -12,8 +12,9 @@ function! s:_rounder.activate() "{{{
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
   let self.using_region_hl = g:yankround_use_region_hl
-  let t:yankround_anchor = 1
-  let w:yankround_anchor = 1
+  let self.anchortime = localtime()
+  let t:yankround_anchor = self.anchortime
+  let w:yankround_anchor = self.anchortime
   if self.using_region_hl
     call self._region_hl(getregtype(self.register))
   end
@@ -103,12 +104,14 @@ endfunction
 "}}}
 function! s:_rounder._clear_region_hl() "{{{
   let save_here = [tabpagenr(), winnr(), winsaveview()]
-  if !has_key(t:, 'yankround_anchor') && !s:_caught_tabpage_anchor()
+  if !has_key(t:, 'yankround_anchor') && !s:_caught_tabpage_anchor(self.anchortime)
+    echoerr 'yankround: match ID '. self.match_id. ' is not found.'
     return
   end
-  if !has_key(w:, 'yankround_anchor') && !s:_caught_win_anchor()
-    silent exe save_here[1].'wincmd w'
+  if !has_key(w:, 'yankround_anchor') && !s:_caught_win_anchor(self.anchortime)
+    silent exe 'tabn' save_here[0]
     call winrestview(save_here[2])
+    echoerr 'yankround: match ID '. self.match_id. ' is not found.'
     return
   end
   call matchdelete(self.match_id)
@@ -119,18 +122,18 @@ function! s:_rounder._clear_region_hl() "{{{
 endfunction
 "}}}
 
-function! s:_caught_tabpage_anchor() "{{{
+function! s:_caught_tabpage_anchor(anchortime) "{{{
   for tn in range(1, tabpagenr('$'))
-    if gettabvar(tn, 'yankround_anchor')!=''
+    if gettabvar(tn, 'yankround_anchor')==a:anchortime
       silent exe 'tabn' tn
       return 1
     end
   endfor
 endfunction
 "}}}
-function! s:_caught_win_anchor() "{{{
+function! s:_caught_win_anchor(anchortime) "{{{
   for wn in range(1, winnr('$'))
-    if getwinvar(wn, 'yankround_anchor')!=''
+    if getwinvar(wn, 'yankround_anchor')==a:anchortime
       silent exe wn.'wincmd w'
       return 1
     end
