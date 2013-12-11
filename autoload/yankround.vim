@@ -21,6 +21,7 @@ function! s:_rounder.activate() "{{{
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
+    autocmd BufWritePost *  call s:rounder.destroy()
     autocmd CmdwinEnter *   let s:rounder.stop = 1
     autocmd CmdwinLeave *   let s:rounder.stop = 0
   aug END
@@ -102,6 +103,7 @@ function! s:_rounder.destroy() "{{{
   let g:yankround#stop_caching = 0
 endfunction
 "}}}
+
 function! s:_rounder._clear_region_hl() "{{{
   let save_here = [tabpagenr(), winnr(), winsaveview()]
   if !has_key(t:, 'yankround_anchor') && !s:_caught_tabpage_anchor(self.anchortime)
@@ -121,7 +123,6 @@ function! s:_rounder._clear_region_hl() "{{{
   call winrestview(save_here[2])
 endfunction
 "}}}
-
 function! s:_caught_tabpage_anchor(anchortime) "{{{
   for tn in range(1, tabpagenr('$'))
     if gettabvar(tn, 'yankround_anchor')==a:anchortime
