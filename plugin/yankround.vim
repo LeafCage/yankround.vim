@@ -11,7 +11,6 @@ nnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp')<Bar>call
 nnoremap <silent><Plug>(yankround-gP)    :<C-u>exe yankround#init('gP')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
-command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
 "=============================================================================
 
 let s:path = expand(g:yankround_dir). '/cache'
