@@ -13,9 +13,9 @@ function! s:_rounder.activate() "{{{
   let self.changedtick = b:changedtick
   let self.using_region_hl = g:yankround_use_region_hl
   let self.anchortime = localtime()
-  let t:yankround_anchor = self.anchortime
-  let w:yankround_anchor = self.anchortime
   if self.using_region_hl
+    let t:yankround_anchor = self.anchortime
+    let w:yankround_anchor = self.anchortime
     call self._region_hl(getregtype(self.register))
   end
   aug yankround_rounder
