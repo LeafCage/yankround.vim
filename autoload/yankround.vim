@@ -28,13 +28,12 @@ function! s:_rounder.activate() "{{{
 endfunction
 "}}}
 function! s:_rounder._region_hl(regtype) "{{{
-  if a:regtype[0]=="\<C-v>"
-    let [sl, sc] = [line("'["), col("'[")]
-    let [el, ec] = [line("']"), col("']")]
-    let pat = printf('\v\c%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1)
-  else
-    let pat = '.\%>''\[.*\%<''\]..'
-  end
+  let [sl, sc] = [line("'["), col("'[")]
+  let [el, ec] = [line("']"), col("']")]
+  let pat =
+    \ a:regtype[0]==#"\<C-v>" ? printf('\v\c%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1) :
+    \ a:regtype[0]==#'v' ? printf('\v\c%%%dl%%>%dc\_.*%%%dl%%<%dc', sl, sc-1, el, ec+1) :
+    \ printf('\v\c%%%dl\_.*%%%dl', sl, el)
   if self.match_id
     try| call matchdelete(self.match_id)| catch /E803/| endtry
     call matchadd(g:yankround_region_hl_groupname, pat, '', self.match_id)
