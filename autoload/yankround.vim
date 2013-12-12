@@ -1,9 +1,9 @@
 if exists('s:save_cpo')| finish| endif
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
-let s:_rounder = {'match_id': 0}
+let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'stop': 0}
+  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'stop': 0, 'match_id': 0}
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -34,13 +34,7 @@ function! s:_rounder._region_hl(regtype) "{{{
     \ a:regtype[0]==#"\<C-v>" ? printf('\v\c%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1) :
     \ a:regtype[0]==#'v' ? printf('\v\c%%%dl%%>%dc\_.*%%%dl%%<%dc', sl, sc-1, el, ec+1) :
     \ printf('\v\c%%%dl\_.*%%%dl', sl, el)
-  if self.match_id
-    try| call matchdelete(self.match_id)| catch /E803/| endtry
-    call matchadd(g:yankround_region_hl_groupname, pat, '', self.match_id)
-  else
-    let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
-    let s:_rounder.match_id = self.match_id
-  end
+  let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
 endfunction
 "}}}
 
