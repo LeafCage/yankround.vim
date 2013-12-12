@@ -45,6 +45,7 @@ function! s:append_yankcache() "{{{
 endfunction
 "}}}
 
+call s:define_region_hl()
 
 "=============================================================================
 let s:_dupliexcluder = {}
