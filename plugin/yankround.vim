@@ -2,6 +2,7 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let g:yankround_dir = get(g:, 'yankround_dir', '~/.cache/yankround')
 let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
+let g:yankround_max_element_length = get(g:, 'yankround_max_element_length', 1048576)
 let g:yankround_use_region_hl = get(g:, 'yankround_use_region_hl', 0)
 let g:yankround_region_hl_groupname = get(g:, 'yankround_region_hl_groupname', 'YankRoundRegion')
 "======================================
@@ -20,20 +21,13 @@ let g:yankround#stop_caching = 0
 
 aug yankround
   autocmd!
-  autocmd ColorScheme *   call s:define_region_hl()
   autocmd CursorMoved *   call s:append_yankcache()
+  autocmd ColorScheme *   call s:define_region_hl()
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
-function! s:define_region_hl() "{{{
-  if &bg=='dark'
-    highlight default YankRoundRegion   guibg=Brown ctermbg=Brown term=reverse
-  else
-    highlight default YankRoundRegion   guibg=LightRed ctermbg=LightRed term=reverse
-  end
-endfunction
-"}}}
 function! s:append_yankcache() "{{{
   if g:yankround#stop_caching || @" ==# substitute(get(g:yankround#cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
+    \ || g:yankround_max_element_length!=0 && strlen(@")>g:yankround_max_element_length
     return
   end
   call insert(g:yankround#cache, getregtype('"'). "\t". @")
@@ -44,6 +38,14 @@ function! s:append_yankcache() "{{{
 endfunction
 "}}}
 
+function! s:define_region_hl() "{{{
+  if &bg=='dark'
+    highlight default YankRoundRegion   guibg=Brown ctermbg=Brown term=reverse
+  else
+    highlight default YankRoundRegion   guibg=LightRed ctermbg=LightRed term=reverse
+  end
+endfunction
+"}}}
 call s:define_region_hl()
 
 "=============================================================================

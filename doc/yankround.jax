@@ -82,6 +82,11 @@ g:yankround_max_history				*g:yankround_max_history*
 	取得する履歴の限界値。
 
 
+g:yankround_max_element_length		*g:yankround_max_element_length*
+	既定値: 1048576
+	文字列長がこれより長いレジスタの内容は記録されない。0にすると無効。
+
+
 g:yankround_use_region_hl			*g:yankround_use_region_hl*
 	既定値: 0
 	非0 だと、yankroundによって貼り付けた、置き換え可能な文字列が
