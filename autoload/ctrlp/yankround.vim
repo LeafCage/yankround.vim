@@ -23,7 +23,8 @@ function! ctrlp#yankround#accept(action, str) "{{{
   let strlist = map(copy(g:_yankround_cache), 's:_cache_to_ctrlpline(v:val)')
   let idx = index(strlist, str)
   if a:action=='t'
-    call remove(g:_yankround_cache, idx)
+    let removed = remove(g:_yankround_cache, idx)
+    let @" = @"==#substitute(removed, '^.\d*\t', '', '') ? '' : @"
     call ctrlp#init(ctrlp#yankround#id())
     return
   end
