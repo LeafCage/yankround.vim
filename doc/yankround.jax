@@ -52,6 +52,8 @@ https://github.com/LeafCage/yankround.vim
   まず以下の設定をしてください。 >
 	nmap p <Plug>(yankround-p)
 	nmap P <Plug>(yankround-P)
+	nmap gp <Plug>(yankround-gp)
+	nmap gP <Plug>(yankround-gP)
 	nmap <C-p> <Plug>(yankround-prev)
 	nmap <C-n> <Plug>(yankround-next)
 < p でテキストの貼り付けを行った後、<C-p><C-n>で貼り付けたテキストを前の履歴・
