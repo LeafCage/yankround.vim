@@ -15,9 +15,9 @@ nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
 "=============================================================================
 
 let s:path = expand(g:yankround_dir). '/cache'
-let g:yankround#cache = has_key(g:, 'yankround#cache') ? g:yankround#cache : !filereadable(s:path) ? [] : readfile(s:path)
+let g:_yankround_cache = has_key(g:, '_yankround_cache') ? g:_yankround_cache : !filereadable(s:path) ? [] : readfile(s:path)
 unlet s:path
-let g:yankround#stop_caching = 0
+let g:_yankround_stop_caching = 0
 
 aug yankround
   autocmd!
@@ -26,14 +26,14 @@ aug yankround
   autocmd VimLeavePre *   call yankround#persistent()
 aug END
 function! s:append_yankcache() "{{{
-  if g:yankround#stop_caching || @" ==# substitute(get(g:yankround#cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
+  if g:_yankround_stop_caching || @" ==# substitute(get(g:_yankround_cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
     \ || g:yankround_max_element_length!=0 && strlen(@")>g:yankround_max_element_length
     return
   end
-  call insert(g:yankround#cache, getregtype('"'). "\t". @")
-  call s:new_dupliexcluder().filter(g:yankround#cache)
-  if len(g:yankround#cache) > g:yankround_max_history
-    call remove(g:yankround#cache, g:yankround_max_history, -1)
+  call insert(g:_yankround_cache, getregtype('"'). "\t". @")
+  call s:new_dupliexcluder().filter(g:_yankround_cache)
+  if len(g:_yankround_cache) > g:yankround_max_history
+    call remove(g:_yankround_cache, g:yankround_max_history, -1)
   end
 endfunction
 "}}}

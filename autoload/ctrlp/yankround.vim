@@ -14,16 +14,16 @@ function! ctrlp#yankround#id() "{{{
 endfunction
 "}}}
 function! ctrlp#yankround#init() "{{{
-  return map(copy(g:yankround#cache), 's:_cache_to_ctrlpline(v:val)')
+  return map(copy(g:_yankround_cache), 's:_cache_to_ctrlpline(v:val)')
 endfunction
 "}}}
 function! ctrlp#yankround#accept(action, str) "{{{
   call ctrlp#exit()
   let str = a:str
-  let strlist = map(copy(g:yankround#cache), 's:_cache_to_ctrlpline(v:val)')
+  let strlist = map(copy(g:_yankround_cache), 's:_cache_to_ctrlpline(v:val)')
   let idx = index(strlist, str)
   if a:action=='t'
-    call remove(g:yankround#cache, idx)
+    call remove(g:_yankround_cache, idx)
     call ctrlp#init(ctrlp#yankround#id())
     return
   end

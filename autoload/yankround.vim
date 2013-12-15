@@ -53,11 +53,11 @@ function! s:_rounder.is_valid() "{{{
 endfunction
 "}}}
 function! s:_rounder.round_cache(incdec) "{{{
-  let self.cachelen = len(g:yankround#cache)
+  let self.cachelen = len(g:_yankround_cache)
   if !self.is_valid()
     return
   end
-  let g:yankround#stop_caching = 1
+  let g:_yankround_stop_caching = 1
   let self.idx = self._round_idx(a:incdec)
   let [str, regtype] = yankround#_get_cache_and_regtype(self.idx)
   call setreg('"', str, regtype)
@@ -93,7 +93,7 @@ function! s:_rounder.destroy() "{{{
   aug yankround_rounder
     autocmd!
   aug END
-  let g:yankround#stop_caching = 0
+  let g:_yankround_stop_caching = 0
 endfunction
 "}}}
 
@@ -172,20 +172,20 @@ endfunction
 "}}}
 
 function! yankround#persistent() "{{{
-  if get(g:, 'yankround_dir', '')=='' || g:yankround#cache==[]
+  if get(g:, 'yankround_dir', '')=='' || g:_yankround_cache==[]
     return
   end
   let dir = expand(g:yankround_dir)
   if !isdirectory(dir)
     call mkdir(dir, 'p')
   end
-  call writefile(g:yankround#cache, dir. '/cache')
+  call writefile(g:_yankround_cache, dir. '/cache')
 endfunction
 "}}}
 
 "======================================
 function! yankround#_get_cache_and_regtype(idx) "{{{
-  let ret = matchlist(g:yankround#cache[a:idx], '^\(.\d*\)\t\(.*\)')
+  let ret = matchlist(g:_yankround_cache[a:idx], '^\(.\d*\)\t\(.*\)')
   return [ret[2], ret[1]]
 endfunction
 "}}}
