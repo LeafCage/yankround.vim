@@ -171,18 +171,6 @@ function! yankround#is_active() "{{{
 endfunction
 "}}}
 
-function! yankround#persistent() "{{{
-  if get(g:, 'yankround_dir', '')=='' || g:_yankround_cache==[]
-    return
-  end
-  let dir = expand(g:yankround_dir)
-  if !isdirectory(dir)
-    call mkdir(dir, 'p')
-  end
-  call writefile(g:_yankround_cache, dir. '/cache')
-endfunction
-"}}}
-
 "======================================
 function! yankround#_get_cache_and_regtype(idx) "{{{
   let ret = matchlist(g:_yankround_cache[a:idx], '^\(.\d*\)\t\(.*\)')

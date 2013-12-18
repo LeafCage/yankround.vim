@@ -23,7 +23,7 @@ aug yankround
   autocmd!
   autocmd CursorMoved *   call s:append_yankcache()
   autocmd ColorScheme *   call s:define_region_hl()
-  autocmd VimLeavePre *   call yankround#persistent()
+  autocmd VimLeavePre *   call s:_persistent()
 aug END
 function! s:append_yankcache() "{{{
   if g:_yankround_stop_caching || @" ==# substitute(get(g:_yankround_cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
@@ -35,6 +35,7 @@ function! s:append_yankcache() "{{{
   if len(g:_yankround_cache) > g:yankround_max_history
     call remove(g:_yankround_cache, g:yankround_max_history, -1)
   end
+  call s:_persistent()
 endfunction
 "}}}
 
@@ -68,6 +69,18 @@ function! s:_dupliexcluder._seen(str) "{{{
     let self.seens[a:str] = 1
   end
   return 1
+endfunction
+"}}}
+"======================================
+let s:yankround_dir = expand(g:yankround_dir)
+if !(s:yankround_dir=='' || isdirectory(s:yankround_dir))
+  call mkdir(s:yankround_dir, 'p')
+end
+function! s:_persistent() "{{{
+  if g:yankround_dir=='' || g:_yankround_cache==[]
+    return
+  end
+  call writefile(g:_yankround_cache, s:yankround_dir. '/cache')
 endfunction
 "}}}
 
