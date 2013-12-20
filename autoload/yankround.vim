@@ -14,10 +14,6 @@ function! s:_rounder.activate() "{{{
   let self.using_region_hl = g:yankround_use_region_hl
   let self.anchortime = localtime()
   if self.using_region_hl
-    if !self.in_cmdwin
-      let t:yankround_anchor = self.anchortime
-      let w:yankround_anchor = self.anchortime
-    end
     call self._region_hl(getregtype(self.register))
   end
   call s:_rounder_autocmd()
@@ -32,6 +28,10 @@ function! s:_rounder._region_hl(regtype) "{{{
     \ a:regtype[0]==#'v' ? printf('\v%%%dl%%>%dc%s%%%dl%%<%dc', sl, sc-1, dots, el, ec+1) :
     \ printf('\v%%%dl%s%%%dl', sl, dots, el)
   let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
+  if !self.in_cmdwin
+    let t:yankround_anchor = self.anchortime
+    let w:yankround_anchor = self.anchortime
+  end
 endfunction
 "}}}
 function! s:_rounder_autocmd() "{{{
@@ -39,6 +39,7 @@ function! s:_rounder_autocmd() "{{{
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
     autocmd BufWritePost *  call s:rounder.destroy()
+    autocmd InsertEnter *  call s:rounder.clear_region_hl()
   aug END
 endfunction
 "}}}
@@ -70,7 +71,9 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   if self.using_region_hl
-    call matchdelete(self.match_id)
+    if self.match_id
+      call matchdelete(self.match_id)
+    end
     call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
@@ -91,9 +94,7 @@ endfunction
 "}}}
 
 function! s:_rounder.destroy() "{{{
-  if self.using_region_hl
-    call self._clear_region_hl()
-  end
+  call self.clear_region_hl()
   unlet s:rounder
   aug yankround_rounder
     autocmd!
@@ -102,7 +103,10 @@ function! s:_rounder.destroy() "{{{
 endfunction
 "}}}
 
-function! s:_rounder._clear_region_hl() "{{{
+function! s:_rounder.clear_region_hl() "{{{
+  if !(self.using_region_hl && self.match_id)
+    return
+  end
   if self.in_cmdwin
     if bufname('%')=='[Command Line]'
       call matchdelete(self.match_id)
@@ -121,6 +125,7 @@ function! s:_rounder._clear_region_hl() "{{{
     return
   end
   call matchdelete(self.match_id)
+  let self.match_id = 0
   unlet t:yankround_anchor w:yankround_anchor
   silent exe 'tabn' save_here[0]
   silent exe save_here[1].'wincmd w'
@@ -202,6 +207,7 @@ function! yankround#on_cmdwinleave() "{{{
   call s:_rounder_autocmd()
 endfunction
 "}}}
+
 function! yankround#_get_cache_and_regtype(idx) "{{{
   let ret = matchlist(g:_yankround_cache[a:idx], '^\(.\d*\)\t\(.*\)')
   return [ret[2], ret[1]]
