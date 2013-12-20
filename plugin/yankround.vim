@@ -14,8 +14,16 @@ nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
 "=============================================================================
 
-let s:path = expand(g:yankround_dir). '/cache'
-let g:_yankround_cache = has_key(g:, '_yankround_cache') ? g:_yankround_cache : !filereadable(s:path) ? [] : readfile(s:path)
+let s:yankround_dir = expand(g:yankround_dir)
+if !(s:yankround_dir=='' || isdirectory(s:yankround_dir))
+  call mkdir(s:yankround_dir, 'p')
+end
+
+let s:path = s:yankround_dir. '/history'
+if filereadable(s:yankround_dir. '/cache')
+  call rename(s:yankround_dir. '/cache', s:path)
+end
+let g:_yankround_cache = filereadable(s:path) ? readfile(s:path) : []
 unlet s:path
 let g:_yankround_stop_caching = 0
 
@@ -72,15 +80,11 @@ function! s:_dupliexcluder._seen(str) "{{{
 endfunction
 "}}}
 "======================================
-let s:yankround_dir = expand(g:yankround_dir)
-if !(s:yankround_dir=='' || isdirectory(s:yankround_dir))
-  call mkdir(s:yankround_dir, 'p')
-end
 function! s:_persistent() "{{{
   if g:yankround_dir=='' || g:_yankround_cache==[]
     return
   end
-  call writefile(g:_yankround_cache, s:yankround_dir. '/cache')
+  call writefile(g:_yankround_cache, s:yankround_dir. '/history')
 endfunction
 "}}}
 
