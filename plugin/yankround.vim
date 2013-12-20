@@ -32,6 +32,8 @@ aug yankround
   autocmd CursorMoved *   call s:append_yankcache()
   autocmd ColorScheme *   call s:define_region_hl()
   autocmd VimLeavePre *   call s:_persistent()
+  autocmd CmdwinEnter *   call yankround#on_cmdwinenter()
+  autocmd CmdwinLeave *   call yankround#on_cmdwinleave()
 aug END
 function! s:append_yankcache() "{{{
   if g:_yankround_stop_caching || @" ==# substitute(get(g:_yankround_cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
