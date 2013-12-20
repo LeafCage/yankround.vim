@@ -30,10 +30,11 @@ endfunction
 function! s:_rounder._region_hl(regtype) "{{{
   let [sl, sc] = [line("'["), col("'[")]
   let [el, ec] = [line("']"), col("']")]
+  let dots = sl==el ? '.*' : '\_.*'
   let pat =
     \ a:regtype[0]==#"\<C-v>" ? printf('\v%%>%dl%%>%dc.*%%<%dl%%<%dc', sl-1, sc-1, el+1, ec+1) :
-    \ a:regtype[0]==#'v' ? printf('\v%%%dl%%>%dc\_.*%%%dl%%<%dc', sl, sc-1, el, ec+1) :
-    \ sl==el ? '\%'.sl.'l' : printf('\v%%%dl\_.*%%%dl', sl, el)
+    \ a:regtype[0]==#'v' ? printf('\v%%%dl%%>%dc%s%%%dl%%<%dc', sl, sc-1, dots, el, ec+1) :
+    \ printf('\v%%%dl%s%%%dl', sl, dots, el)
   let self.match_id = matchadd(g:yankround_region_hl_groupname, pat)
 endfunction
 "}}}
