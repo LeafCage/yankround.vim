@@ -1,3 +1,7 @@
+if exists('g:loaded_yankround')
+  finish
+end
+let g:loaded_yankround = 1
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let g:yankround_dir = get(g:, 'yankround_dir', '~/.cache/yankround')
