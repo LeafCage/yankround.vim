@@ -54,9 +54,7 @@ function! s:_rounder.round_cache(incdec) "{{{
   silent exe 'norm!' self.count. '""'. self.keybind
   ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   if self.using_region_hl
-    if self.match_id
-      call matchdelete(self.match_id)
-    end
+    call self.clear_region_hl()
     call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
