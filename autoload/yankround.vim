@@ -16,7 +16,6 @@ function! s:_rounder.activate() "{{{
   if self.using_region_hl
     call self._region_hl(getregtype(self.register))
   end
-  call s:_rounder_autocmd()
 endfunction
 "}}}
 function! s:_rounder._region_hl(regtype) "{{{
@@ -34,28 +33,12 @@ function! s:_rounder._region_hl(regtype) "{{{
   end
 endfunction
 "}}}
-function! s:_rounder_autocmd() "{{{
-  aug yankround_rounder
-    autocmd!
-    autocmd CursorMoved *   call s:rounder.detect_cursmoved()
-    autocmd BufWritePost *  call s:rounder.destroy()
-    autocmd InsertEnter *   call s:rounder.clear_region_hl()
-  aug END
-endfunction
-"}}}
 
-function! s:_rounder.detect_cursmoved() "{{{
-  if getpos('.')==self.pos
-    return
-  end
-  call self.destroy()
-endfunction
-"}}}
 function! s:_rounder.is_valid() "{{{
   if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
     return 1
   end
-  call self.destroy()
+  call s:destroy_rounder()
 endfunction
 "}}}
 function! s:_rounder.round_cache(incdec) "{{{
@@ -90,16 +73,6 @@ function! s:_rounder._round_idx(incdec) "{{{
   end
   let self.idx += a:incdec
   return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
-endfunction
-"}}}
-
-function! s:_rounder.destroy() "{{{
-  call self.clear_region_hl()
-  unlet s:rounder
-  aug yankround_rounder
-    autocmd!
-  aug END
-  let g:_yankround_stop_caching = 0
 endfunction
 "}}}
 
@@ -156,7 +129,7 @@ endfunction
 "Main
 function! yankround#init(keybind) "{{{
   if has_key(s:, 'rounder')
-    call s:rounder.destroy()
+    call s:destroy_rounder()
   end
   let s:rounder = s:new_rounder(a:keybind)
   return 'norm! "'. v:register. v:count1. a:keybind
@@ -164,6 +137,24 @@ endfunction
 "}}}
 function! yankround#activate() "{{{
   call s:rounder.activate()
+  call s:_rounder_autocmd()
+endfunction
+"}}}
+
+function! s:detect_cursmoved() "{{{
+  if getpos('.')==s:rounder.pos
+    return
+  end
+  call s:destroy_rounder()
+endfunction
+"}}}
+function! s:destroy_rounder() "{{{
+  call s:rounder.clear_region_hl()
+  unlet s:rounder
+  aug yankround_rounder
+    autocmd!
+  aug END
+  let g:_yankround_stop_caching = 0
 endfunction
 "}}}
 
@@ -188,6 +179,16 @@ endfunction
 "}}}
 
 "======================================
+function! s:_rounder_autocmd() "{{{
+  aug yankround_rounder
+    autocmd!
+    autocmd CursorMoved *   call s:detect_cursmoved()
+    autocmd BufWritePost *  call s:destroy_rounder()
+    autocmd InsertEnter *   call s:rounder.clear_region_hl()
+  aug END
+endfunction
+"}}}
+
 function! yankround#on_cmdwinenter() "{{{
   if !has_key(s:, 'rounder')
     return
