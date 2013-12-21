@@ -39,7 +39,7 @@ function! s:_rounder_autocmd() "{{{
     autocmd!
     autocmd CursorMoved *   call s:rounder.detect_cursmoved()
     autocmd BufWritePost *  call s:rounder.destroy()
-    autocmd InsertEnter *  call s:rounder.clear_region_hl()
+    autocmd InsertEnter *   call s:rounder.clear_region_hl()
   aug END
 endfunction
 "}}}
@@ -197,12 +197,14 @@ function! yankround#on_cmdwinenter() "{{{
   aug yankround_rounder
     autocmd!
   aug END
+  let g:_yankround_stop_caching = 0
 endfunction
 "}}}
 function! yankround#on_cmdwinleave() "{{{
   if !has_key(s:, 'save_rounder')
     return
   end
+  let g:_yankround_stop_caching = 1
   let s:rounder = s:save_rounder
   call s:_rounder_autocmd()
 endfunction
