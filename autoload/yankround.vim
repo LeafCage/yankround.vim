@@ -88,13 +88,11 @@ function! s:_rounder.clear_region_hl() "{{{
   end
   let save_here = [tabpagenr(), winnr(), winsaveview()]
   if !has_key(t:, 'yankround_anchor') && !s:_caught_tabpage_anchor(self.anchortime)
-    echoerr 'yankround: match ID "'. self.match_id. '" is not found.'
     return
   end
   if !has_key(w:, 'yankround_anchor') && !s:_caught_win_anchor(self.anchortime)
     silent exe 'tabn' save_here[0]
     call winrestview(save_here[2])
-    echoerr 'yankround: match ID "'. self.match_id. '" is not found.'
     return
   end
   call matchdelete(self.match_id)
