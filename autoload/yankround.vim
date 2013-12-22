@@ -34,6 +34,10 @@ function! s:_rounder._region_hl(regtype) "{{{
 endfunction
 "}}}
 
+function! s:_rounder.is_cursormoved() "{{{
+  return getpos('.')!=s:rounder.pos
+endfunction
+"}}}
 function! s:_rounder.is_valid() "{{{
   if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
     return 1
@@ -137,13 +141,6 @@ function! yankround#activate() "{{{
 endfunction
 "}}}
 
-function! s:detect_cursmoved() "{{{
-  if getpos('.')==s:rounder.pos
-    return
-  end
-  call s:destroy_rounder()
-endfunction
-"}}}
 function! s:destroy_rounder() "{{{
   call s:rounder.clear_region_hl()
   unlet s:rounder
@@ -178,7 +175,7 @@ endfunction
 function! s:_rounder_autocmd() "{{{
   aug yankround_rounder
     autocmd!
-    autocmd CursorMoved *   call s:detect_cursmoved()
+    autocmd CursorMoved *   if s:rounder.is_cursormoved()| call s:destroy_rounder()| end
     autocmd BufWritePost *  call s:destroy_rounder()
     autocmd InsertEnter *   call s:rounder.clear_region_hl()
   aug END
