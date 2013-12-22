@@ -3,7 +3,8 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
-  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'in_cmdwin': bufname('%')=='[Command Line]', 'match_id': 0}
+  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1,
+    \ 'match_id': 0, 'in_cmdwin': bufname('%')=='[Command Line]', 'anchortime': localtime()}
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -12,7 +13,6 @@ function! s:_rounder.activate() "{{{
   let self.pos = getpos('.')
   let self.changedtick = b:changedtick
   let self.using_region_hl = g:yankround_use_region_hl
-  let self.anchortime = localtime()
   if self.using_region_hl
     call self._region_hl(getregtype(self.register))
   end
@@ -85,6 +85,7 @@ function! s:_rounder.clear_region_hl() "{{{
   if self.in_cmdwin
     if bufname('%')=='[Command Line]'
       call matchdelete(self.match_id)
+      let self.match_id = 0
     end
     return
   end
