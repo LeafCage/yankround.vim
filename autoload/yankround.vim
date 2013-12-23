@@ -4,7 +4,7 @@ let s:save_cpo = &cpo| set cpo&vim
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
-    \ 'in_cmdwin': bufname('%')=='[Command Line]', 'anchortime': localtime(), 'in_mapexpr': 0}
+    \ 'in_cmdwin': bufname('%')=='[Command Line]', 'anchortime': localtime()}
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -38,21 +38,16 @@ function! s:_rounder.is_cursormoved() "{{{
   return getpos('.')!=s:rounder.pos
 endfunction
 "}}}
-function! s:_rounder.is_valid(in_mapexpr) "{{{
-  let self.in_mapexpr = a:in_mapexpr
-  try
-    if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
-      return 1
-    end
-    call s:destroy_rounder()
-  finally
-    let self.in_mapexpr = 0
-  endtry
+function! s:_rounder.is_valid() "{{{
+  if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
+    return 1
+  end
+  call s:destroy_rounder()
 endfunction
 "}}}
 function! s:_rounder.round_cache(incdec) "{{{
   let self.cachelen = len(g:_yankround_cache)
-  if !self.is_valid(0)
+  if !self.is_valid()
     return
   end
   let g:_yankround_stop_caching = 1
@@ -106,10 +101,11 @@ function! s:_rounder.clear_region_hl() "{{{
   call matchdelete(self.match_id)
   let self.match_id = 0
   unlet t:yankround_anchor w:yankround_anchor
-  if !self.in_mapexpr
+  try
     silent exe 'tabn' save_here[0]
     silent exe save_here[1].'wincmd w'
-  end
+  catch /E523:/ "in :map-<expr>
+  endtry
   call winrestview(save_here[2])
 endfunction
 "}}}
@@ -175,7 +171,7 @@ endfunction
 "}}}
 
 function! yankround#is_active() "{{{
-  return has_key(s:, 'rounder') && s:rounder.is_valid(1)
+  return has_key(s:, 'rounder') && s:rounder.is_valid()
 endfunction
 "}}}
 
