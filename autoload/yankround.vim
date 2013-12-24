@@ -56,7 +56,6 @@ function! s:_rounder.round_cache(incdec) "{{{
   call setreg('"', str, regtype)
   silent undo
   silent exe 'norm!' self.count. '""'. self.keybind
-  ec 'yankround: ('. (self.idx+1). '/'. self.cachelen. ')'
   if self.using_region_hl
     call self.clear_region_hl()
     call self._region_hl(regtype)
@@ -160,6 +159,7 @@ function! yankround#prev() "{{{
     return
   end
   call s:rounder.round_cache(1)
+  echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}
 function! yankround#next() "{{{
@@ -167,11 +167,16 @@ function! yankround#next() "{{{
     return
   end
   call s:rounder.round_cache(-1)
+  echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}
 
 function! yankround#is_active() "{{{
   return has_key(s:, 'rounder') && s:rounder.is_valid()
+endfunction
+"}}}
+function! yankround#get_roundstatus() "{{{
+  return has_key(s:, 'rounder') ? '('. (s:rounder.idx+1). '/'. s:rounder.cachelen. ')' : ''
 endfunction
 "}}}
 
