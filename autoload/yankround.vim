@@ -140,7 +140,7 @@ function! yankround#init(keybind) "{{{
   if has_key(s:, 'rounder')
     call s:destroy_rounder()
   end
-  if v:register=='"' || getreg(v:register)!=''
+  if getregtype()!=''
     let s:rounder = s:new_rounder(a:keybind)
   end
   return 'norm! "'. v:register. v:count1. a:keybind
