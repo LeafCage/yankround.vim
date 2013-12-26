@@ -134,11 +134,16 @@ function! yankround#init(keybind) "{{{
   if has_key(s:, 'rounder')
     call s:destroy_rounder()
   end
-  let s:rounder = s:new_rounder(a:keybind)
+  if v:register=='"' || getreg(v:register)!=''
+    let s:rounder = s:new_rounder(a:keybind)
+  end
   return 'norm! "'. v:register. v:count1. a:keybind
 endfunction
 "}}}
 function! yankround#activate() "{{{
+  if !has_key(s:, 'rounder')
+    return
+  end
   call s:rounder.activate()
   call s:_rounder_autocmd()
 endfunction
