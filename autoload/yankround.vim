@@ -11,7 +11,7 @@ endfunction
 "}}}
 function! s:_rounder.activate() "{{{
   let self.pos = getpos('.')
-  let self.changedtick = b:changedtick
+  let self.update_changedtick()
   let self.using_region_hl = g:yankround_use_region_hl
   if self.using_region_hl
     call self._region_hl(getregtype(self.register))
@@ -34,6 +34,11 @@ function! s:_rounder._region_hl(regtype) "{{{
 endfunction
 "}}}
 
+function! s:_rounder.update_changedtick() "{{{
+  let self.changedtick = b:changedtick
+endfunction
+"}}}
+
 function! s:_rounder.is_cursormoved() "{{{
   return getpos('.')!=s:rounder.pos
 endfunction
@@ -45,6 +50,7 @@ function! s:_rounder.is_valid() "{{{
   call s:destroy_rounder()
 endfunction
 "}}}
+
 function! s:_rounder.round_cache(incdec) "{{{
   let self.cachelen = len(g:_yankround_cache)
   if !self.is_valid()
@@ -61,7 +67,7 @@ function! s:_rounder.round_cache(incdec) "{{{
     call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
-  let self.changedtick = b:changedtick
+  let self.update_changedtick()
 endfunction
 "}}}
 function! s:_rounder._round_idx(incdec) "{{{
@@ -190,7 +196,7 @@ function! s:_rounder_autocmd() "{{{
   aug yankround_rounder
     autocmd!
     autocmd CursorMoved *   if s:rounder.is_cursormoved()| call s:destroy_rounder()| end
-    autocmd BufWritePost *  call s:destroy_rounder()
+    autocmd BufWritePost *  call s:rounder.update_changedtick()
     autocmd InsertEnter *   call s:rounder.clear_region_hl()
   aug END
 endfunction
