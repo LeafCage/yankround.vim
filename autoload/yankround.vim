@@ -11,7 +11,7 @@ endfunction
 "}}}
 function! s:_rounder.activate() "{{{
   let self.pos = getpos('.')
-  let self.update_changedtick()
+  call self.update_changedtick()
   let self.using_region_hl = g:yankround_use_region_hl
   if self.using_region_hl
     call self._region_hl(getregtype(self.register))
@@ -67,7 +67,7 @@ function! s:_rounder.round_cache(incdec) "{{{
     call self._region_hl(regtype)
   end
   let self.pos = getpos('.')
-  let self.update_changedtick()
+  call self.update_changedtick()
 endfunction
 "}}}
 function! s:_rounder._round_idx(incdec) "{{{
