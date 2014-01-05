@@ -4,7 +4,11 @@ let s:save_cpo = &cpo| set cpo&vim
 let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
-    \ 'in_cmdwin': bufname('%')=='[Command Line]', 'anchortime': localtime()}
+    \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime()}
+  if !_.in_cmdwin && undotree().entries!=[]
+    let _.undofilepath = expand(g:yankround_dir).'/save_undo'
+    exe 'wundo!' _.undofilepath
+  end
   call extend(_, s:_rounder)
   return _
 endfunction
@@ -61,6 +65,7 @@ function! s:_rounder.round_cache(incdec) "{{{
   let [str, regtype] = yankround#_get_cache_and_regtype(self.idx)
   call setreg('"', str, regtype)
   silent undo
+  call self._rest_undotree()
   silent exe 'norm!' self.count. '""'. self.keybind
   if self.using_region_hl
     call self.clear_region_hl()
@@ -82,13 +87,27 @@ function! s:_rounder._round_idx(incdec) "{{{
   return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
 endfunction
 "}}}
+function! s:_rounder._rest_undotree() "{{{
+  if has_key(self, 'undofilepath')
+    silent exe 'rundo' self.undofilepath
+    return
+  else self.in_cmdwin
+    return
+  end
+  let save_ul = &undolevels
+  set ul=-1
+  call setline('.', getline('.'))
+  set nomod
+  let &ul = save_ul
+endfunction
+"}}}
 
 function! s:_rounder.clear_region_hl() "{{{
   if !(self.using_region_hl && self.match_id)
     return
   end
   if self.in_cmdwin
-    if bufname('%')=='[Command Line]'
+    if bufname('%')==#'[Command Line]'
       call matchdelete(self.match_id)
       let self.match_id = 0
     end
