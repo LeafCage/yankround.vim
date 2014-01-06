@@ -5,7 +5,7 @@ let s:_rounder = {}
 function! s:new_rounder(keybind) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
     \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime()}
-  if !_.in_cmdwin && undotree().entries!=[]
+  if !_.in_cmdwin && undotree().seq_last!=0
     let _.undofilepath = expand(g:yankround_dir).'/save_undo'
     exe 'wundo!' _.undofilepath
   end
@@ -88,10 +88,10 @@ function! s:_rounder._round_idx(incdec) "{{{
 endfunction
 "}}}
 function! s:_rounder._rest_undotree() "{{{
-  if has_key(self, 'undofilepath')
-    silent exe 'rundo' self.undofilepath
+  if self.in_cmdwin
     return
-  else self.in_cmdwin
+  elseif has_key(self, 'undofilepath')
+    silent exe 'rundo' self.undofilepath
     return
   end
   let save_ul = &undolevels
