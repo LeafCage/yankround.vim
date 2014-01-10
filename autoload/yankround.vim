@@ -48,7 +48,7 @@ function! s:_rounder.is_cursormoved() "{{{
 endfunction
 "}}}
 function! s:_rounder.is_valid() "{{{
-  if get(self, 'cachelen', 1) != 0 && self.changedtick==b:changedtick
+  if get(self, 'cachelen', 1) != 0 && has_key(self, 'changedtick') && self.changedtick==b:changedtick
     return 1
   end
   call s:destroy_rounder()
@@ -103,7 +103,7 @@ endfunction
 "}}}
 
 function! s:_rounder.clear_region_hl() "{{{
-  if !(self.using_region_hl && self.match_id)
+  if !(has_key(self, 'using_region_hl') && self.using_region_hl && self.match_id)
     return
   end
   if self.in_cmdwin
