@@ -56,8 +56,10 @@ https://github.com/LeafCage/yankround.vim
 * YankRing.vim的な利用法 ~
   まず以下の設定をしてください。 >
 	nmap p <Plug>(yankround-p)
+	xmap p <Plug>(yankround-p)
 	nmap P <Plug>(yankround-P)
 	nmap gp <Plug>(yankround-gp)
+	xmap gp <Plug>(yankround-gp)
 	nmap gP <Plug>(yankround-gP)
 	nmap <C-p> <Plug>(yankround-prev)
 	nmap <C-n> <Plug>(yankround-next)
@@ -132,27 +134,35 @@ g:yankround_region_hl_groupname		*g:yankround_region_hl_groupname*
 |YankRing.vim|のような使い方をしたいのならキーマッピングは必須である。
 
 <Plug>(yankround-p)				*<Plug>(yankround-p)*
-	有効モード: ノーマル
+	有効モード: ノーマル ビジュアル
 	通常の|p|の役割を果たす。この後、カーソルを動かすまで、
 	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+	ビジュアルモードで使用した場合、ビジュアル選択されている文字列をレジス
+	タ文字列と置き換えて、ビジュアル選択されていた文字列がレジスタに入る。
+	|v_p|
 
 
 <Plug>(yankround-P)				*<Plug>(yankround-P)*
-	有効モード: ノーマル
+	有効モード: ノーマル ビジュアル
 	通常の|P|の役割を果たす。この後、カーソルを動かすまで、
 	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+	ビジュアルモードでの挙動は|<Plug>(yankround-p)|と同じである。
 
 
 <Plug>(yankround-gp)				*<Plug>(yankround-gp)*
-	有効モード: ノーマル
+	有効モード: ノーマル ビジュアル
 	通常の|gp|の役割を果たす。この後、カーソルを動かすまで、
 	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+	ビジュアルモードで使用した場合、ビジュアル選択されている文字列をレジス
+	タ文字列と置き換えて、ビジュアル選択されていた文字列がレジスタに入る。
+	カーソルは置き換えられた文字列の後ろに来る。|v_p|
 
 
 <Plug>(yankround-gP)				*<Plug>(yankround-gP)*
 	有効モード: ノーマル
 	通常の|gP|の役割を果たす。この後、カーソルを動かすまで、
 	|<Plug>(yankround-prev)||<Plug>(yankround-next)|が有効になる。
+	ビジュアルモードでの挙動は|<Plug>(yankround-gp)|と同じである。
 
 
 <Plug>(yankround-prev)				*<Plug>(yankround-prev)*
