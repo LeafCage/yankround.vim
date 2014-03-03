@@ -1,19 +1,19 @@
 if exists('s:save_cpo')| finish| endif
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
-let s:_rounder = {}
-function! s:new_rounder(keybind, is_vmode) "{{{
+let s:Rounder = {}
+function! s:Rounder(keybind, is_vmode) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
     \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime(), 'is_vmode': a:is_vmode}
   if !_.in_cmdwin && undotree().seq_last!=0
     let _.undofilepath = expand(g:yankround_dir).'/save_undo'
     exe 'wundo!' _.undofilepath
   end
-  call extend(_, s:_rounder)
+  call extend(_, s:Rounder)
   return _
 endfunction
 "}}}
-function! s:_rounder.activate() "{{{
+function! s:Rounder.activate() "{{{
   let self.pos = getpos('.')
   call self.update_changedtick()
   let self.using_region_hl = g:yankround_use_region_hl
@@ -22,7 +22,7 @@ function! s:_rounder.activate() "{{{
   end
 endfunction
 "}}}
-function! s:_rounder._region_hl(regtype) "{{{
+function! s:Rounder._region_hl(regtype) "{{{
   let [sl, sc] = [line("'["), col("'[")]
   let [el, ec] = [line("']"), col("']")]
   let dots = sl==el ? '.*' : '\_.*'
@@ -38,16 +38,16 @@ function! s:_rounder._region_hl(regtype) "{{{
 endfunction
 "}}}
 
-function! s:_rounder.update_changedtick() "{{{
+function! s:Rounder.update_changedtick() "{{{
   let self.changedtick = b:changedtick
 endfunction
 "}}}
 
-function! s:_rounder.is_cursormoved() "{{{
+function! s:Rounder.is_cursormoved() "{{{
   return getpos('.')!=s:rounder.pos
 endfunction
 "}}}
-function! s:_rounder.is_valid() "{{{
+function! s:Rounder.is_valid() "{{{
   if get(self, 'cachelen', 1) != 0 && has_key(self, 'changedtick') && self.changedtick==b:changedtick
     return 1
   end
@@ -55,7 +55,7 @@ function! s:_rounder.is_valid() "{{{
 endfunction
 "}}}
 
-function! s:_rounder.round_cache(incdec) "{{{
+function! s:Rounder.round_cache(incdec) "{{{
   let self.cachelen = len(g:_yankround_cache)
   if !self.is_valid()
     return
@@ -79,7 +79,7 @@ function! s:_rounder.round_cache(incdec) "{{{
   call self.update_changedtick()
 endfunction
 "}}}
-function! s:_rounder._round_idx(incdec) "{{{
+function! s:Rounder._round_idx(incdec) "{{{
   if self.idx==-1
     if @"!=yankround#_get_cache_and_regtype(0)[0] || self.register!='"'
       return 0
@@ -91,7 +91,7 @@ function! s:_rounder._round_idx(incdec) "{{{
   return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
 endfunction
 "}}}
-function! s:_rounder._rest_undotree() "{{{
+function! s:Rounder._rest_undotree() "{{{
   if self.in_cmdwin
     return
   elseif has_key(self, 'undofilepath')
@@ -106,7 +106,7 @@ function! s:_rounder._rest_undotree() "{{{
 endfunction
 "}}}
 
-function! s:_rounder.clear_region_hl() "{{{
+function! s:Rounder.clear_region_hl() "{{{
   if !(has_key(self, 'using_region_hl') && self.using_region_hl && self.match_id)
     return
   end
@@ -164,7 +164,7 @@ function! yankround#init(keybind, ...) "{{{
     call s:destroy_rounder()
   end
   if getregtype()!=''
-    let s:rounder = s:new_rounder(a:keybind, a:0)
+    let s:rounder = s:Rounder(a:keybind, a:0)
   end
   if !a:0 || v:register!='"'
     return 'norm! '. (a:0 ? 'gv' : ''). '"'. v:register. v:count1. a:keybind

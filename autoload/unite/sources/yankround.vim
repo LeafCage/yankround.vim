@@ -9,10 +9,10 @@ endfunction
 "=============================================================================
 let s:source = {'name': 'yankround', 'description': 'candidates from yankround', 'default_kind': 'word'}
 function! s:source.gather_candidates(args, context) "{{{
-  return map(copy(g:_yankround_cache), 's:_sourcize(v:val)')
+  return map(copy(g:_yankround_cache), 's:_candidatify(v:val)')
 endfunction
 "}}}
-function! s:_sourcize(cache) "{{{
+function! s:_candidatify(cache) "{{{
   let matchlist = matchlist(a:cache, "^\\(.\\d*\\)\t\\(.*\\)")
   return {'word': matchlist[2], 'action__regtype': matchlist[1], 'is_multiline': 1, 'source__raw': a:cache}
 endfunction
