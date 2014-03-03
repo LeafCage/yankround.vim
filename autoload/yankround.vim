@@ -2,9 +2,9 @@ if exists('s:save_cpo')| finish| endif
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:_rounder = {}
-function! s:new_rounder(keybind) "{{{
+function! s:new_rounder(keybind, is_vmode) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
-    \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime()}
+    \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime(), 'is_vmode': a:is_vmode}
   if !_.in_cmdwin && undotree().seq_last!=0
     let _.undofilepath = expand(g:yankround_dir).'/save_undo'
     exe 'wundo!' _.undofilepath
@@ -66,7 +66,11 @@ function! s:_rounder.round_cache(incdec) "{{{
   call setreg('"', str, regtype)
   silent undo
   call self._rest_undotree()
-  silent exe 'norm!' self.count. '""'. self.keybind
+  if self.is_vmode
+    silent exe 'norm! gv"0'. self.count. self.keybind
+  else
+    silent exe 'norm! ""'. self.count. self.keybind
+  end
   if self.using_region_hl
     call self.clear_region_hl()
     call self._region_hl(regtype)
@@ -80,7 +84,7 @@ function! s:_rounder._round_idx(incdec) "{{{
     if @"!=yankround#_get_cache_and_regtype(0)[0] || self.register!='"'
       return 0
     else
-      let self.idx = 0
+      let self.idx = self.is_vmode ? 1 : 0
     end
   end
   let self.idx += a:incdec
@@ -155,14 +159,18 @@ endfunction
 
 "=============================================================================
 "Main
-function! yankround#init(keybind) "{{{
+function! yankround#init(keybind, ...) "{{{
   if has_key(s:, 'rounder')
     call s:destroy_rounder()
   end
   if getregtype()!=''
-    let s:rounder = s:new_rounder(a:keybind)
+    let s:rounder = s:new_rounder(a:keybind, a:0)
   end
-  return 'norm! "'. v:register. v:count1. a:keybind
+  if !a:0 || v:register!='"'
+    return 'norm! '. (a:0 ? 'gv' : ''). '"'. v:register. v:count1. a:keybind
+  end
+  let @0 = @"
+  return 'norm! gv"0'. v:count1. a:keybind
 endfunction
 "}}}
 function! yankround#activate() "{{{

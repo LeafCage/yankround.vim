@@ -11,6 +11,10 @@ nnoremap <silent><Plug>(yankround-p)    :<C-u>exe yankround#init('p')<Bar>call y
 nnoremap <silent><Plug>(yankround-P)    :<C-u>exe yankround#init('P')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-gP)    :<C-u>exe yankround#init('gP')<Bar>call yankround#activate()<CR>
+xnoremap <silent><Plug>(yankround-p)    :<C-u>exe yankround#init('p', 'v')<Bar>call yankround#activate()<CR>
+xmap <Plug>(yankround-P)  <Plug>(yankround-p)
+xnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp', 'v')<Bar>call yankround#activate()<CR>
+xmap <Plug>(yankround-gP)  <Plug>(yankround-gp)
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
 "=============================================================================
