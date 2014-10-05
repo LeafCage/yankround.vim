@@ -89,7 +89,7 @@ https://github.com/LeafCage/yankround.vim
 変数						*yankround-variables*
 
 g:yankround_dir					*g:yankround_dir*
-	既定値: "~/.cache/yankround"
+	既定値: "~/.config/vim/yankround"
 	このディレクトリ以下に履歴を永続化したファイルが作られる。
 
 

@@ -2,7 +2,7 @@ if exists('s:save_cpo')| finish| endif
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:Rounder = {}
-function! s:Rounder(keybind, is_vmode) "{{{
+function! s:newRounder(keybind, is_vmode) "{{{
   let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
     \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime(), 'is_vmode': a:is_vmode}
   if !_.in_cmdwin && undotree().seq_last!=0
@@ -158,13 +158,13 @@ endfunction
 
 
 "=============================================================================
-"Main
+"Main:
 function! yankround#init(keybind, ...) "{{{
   if has_key(s:, 'rounder')
     call s:destroy_rounder()
   end
   if getregtype()!=''
-    let s:rounder = s:Rounder(a:keybind, a:0)
+    let s:rounder = s:newRounder(a:keybind, a:0)
   end
   if !a:0 || v:register!='"'
     return 'norm! '. (a:0 ? 'gv' : ''). '"'. v:register. v:count1. a:keybind
@@ -197,6 +197,7 @@ function! yankround#prev() "{{{
     return
   end
   call s:rounder.round_cache(1)
+  call YankRound_persistent()
   echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}
@@ -205,6 +206,7 @@ function! yankround#next() "{{{
     return
   end
   call s:rounder.round_cache(-1)
+  call YankRound_persistent()
   echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}

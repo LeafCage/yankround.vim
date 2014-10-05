@@ -1,7 +1,7 @@
 if exists('g:loaded_yankround')| finish| endif| let g:loaded_yankround = 1
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
-let g:yankround_dir = get(g:, 'yankround_dir', '~/.cache/yankround')
+let g:yankround_dir = get(g:, 'yankround_dir', '~/.config/vim/yankround')
 let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
 let g:yankround_max_element_length = get(g:, 'yankround_max_element_length', 1048576)
 let g:yankround_use_region_hl = get(g:, 'yankround_use_region_hl', 0)
@@ -25,9 +25,6 @@ if !(s:yankround_dir=='' || isdirectory(s:yankround_dir))
 end
 
 let s:path = s:yankround_dir. '/history'
-if filereadable(s:yankround_dir. '/cache')
-  call rename(s:yankround_dir. '/cache', s:path)
-end
 let g:_yankround_cache = filereadable(s:path) ? readfile(s:path) : []
 unlet s:path
 let g:_yankround_stop_caching = 0
@@ -36,7 +33,6 @@ aug yankround
   autocmd!
   autocmd CursorMoved *   call s:append_yankcache()
   autocmd ColorScheme *   call s:define_region_hl()
-  autocmd VimLeavePre *   call s:_persistent()
   autocmd CmdwinEnter *   call yankround#on_cmdwinenter()
   autocmd CmdwinLeave *   call yankround#on_cmdwinleave()
 aug END
@@ -46,11 +42,11 @@ function! s:append_yankcache() "{{{
     return
   end
   call insert(g:_yankround_cache, getregtype('"'). "\t". @")
-  call s:new_dupliexcluder().filter(g:_yankround_cache)
+  call s:newDupliMiller().mill(g:_yankround_cache)
   if len(g:_yankround_cache) > g:yankround_max_history
     call remove(g:_yankround_cache, g:yankround_max_history, -1)
   end
-  call s:_persistent()
+  call YankRound_persistent()
 endfunction
 "}}}
 
@@ -65,18 +61,14 @@ endfunction
 call s:define_region_hl()
 
 "=============================================================================
-let s:_dupliexcluder = {}
-function! s:new_dupliexcluder() "{{{
-  let _ = {'seens': {}}
-  call extend(_, s:_dupliexcluder, 'keep')
-  return _
+let s:DupliMiller = {}
+function! s:newDupliMiller() "{{{
+  let obj = copy(s:DupliMiller)
+  let obj.seens = {}
+  return obj
 endfunction
 "}}}
-function! s:_dupliexcluder.filter(list) "{{{
-  return filter(a:list, 'self._seen(v:val)')
-endfunction
-"}}}
-function! s:_dupliexcluder._seen(str) "{{{
+function! s:DupliMiller._is_firstseen(str) "{{{
   if has_key(self.seens, a:str)
     return
   end
@@ -86,8 +78,12 @@ function! s:_dupliexcluder._seen(str) "{{{
   return 1
 endfunction
 "}}}
+function! s:DupliMiller.mill(list) "{{{
+  return filter(a:list, 'self._is_firstseen(v:val)')
+endfunction
+"}}}
 "======================================
-function! s:_persistent() "{{{
+function! YankRound_persistent() "{{{
   if g:yankround_dir=='' || g:_yankround_cache==[]
     return
   end
