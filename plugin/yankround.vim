@@ -1,5 +1,6 @@
-if exists('g:loaded_yankround')| finish| endif| let g:loaded_yankround = 1
+if expand('<sfile>:p')!=#expand('%:p') && exists('g:loaded_yankround')| finish| endif| let g:loaded_yankround = 1
 let s:save_cpo = &cpo| set cpo&vim
+scriptencoding utf-8
 "=============================================================================
 let g:yankround_dir = get(g:, 'yankround_dir', '~/.config/vim/yankround')
 let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
@@ -25,18 +26,22 @@ if !(s:yankround_dir=='' || isdirectory(s:yankround_dir))
 end
 
 let s:path = s:yankround_dir. '/history'
-let g:_yankround_cache = filereadable(s:path) ? readfile(s:path) : []
-unlet s:path
+let s:is_readable = filereadable(s:path)
+let g:_yankround_cache = s:is_readable ? readfile(s:path) : []
+let s:_histfilever = s:is_readable ? getftime(s:path) : 0
+unlet s:path s:is_readable
 let g:_yankround_stop_caching = 0
 
 aug yankround
   autocmd!
   autocmd CursorMoved *   call s:append_yankcache()
   autocmd ColorScheme *   call s:define_region_hl()
+  autocmd VimLeavePre *   call s:_persistent()
   autocmd CmdwinEnter *   call yankround#on_cmdwinenter()
   autocmd CmdwinLeave *   call yankround#on_cmdwinleave()
 aug END
 function! s:append_yankcache() "{{{
+  call s:_reloadhistory()
   if g:_yankround_stop_caching || @" ==# substitute(get(g:_yankround_cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
     \ || g:yankround_max_element_length!=0 && strlen(@")>g:yankround_max_element_length
     return
@@ -46,7 +51,7 @@ function! s:append_yankcache() "{{{
   if len(g:_yankround_cache) > g:yankround_max_history
     call remove(g:_yankround_cache, g:yankround_max_history, -1)
   end
-  call YankRound_persistent()
+  call s:_persistent()
 endfunction
 "}}}
 
@@ -60,7 +65,30 @@ endfunction
 "}}}
 call s:define_region_hl()
 
+function! s:_persistent() "{{{
+  if g:yankround_dir=='' || g:_yankround_cache==[]
+    return
+  end
+  let path = s:yankround_dir. '/history'
+  call writefile(g:_yankround_cache, path)
+  let s:_histfilever = getftime(path)
+endfunction
+"}}}
+function! s:_reloadhistory() "{{{
+  if g:yankround_dir==''
+    return
+  end
+  let path = expand(g:yankround_dir). '/history'
+  if !filereadable(path) || getftime(path) <= s:_histfilever
+    return
+  end
+  let g:_yankround_cache = readfile(path)
+  let s:_histfilever = getftime(path)
+endfunction
+"}}}
+
 "=============================================================================
+"Misc:
 let s:DupliMiller = {}
 function! s:newDupliMiller() "{{{
   let obj = copy(s:DupliMiller)
@@ -80,14 +108,6 @@ endfunction
 "}}}
 function! s:DupliMiller.mill(list) "{{{
   return filter(a:list, 'self._is_firstseen(v:val)')
-endfunction
-"}}}
-"======================================
-function! YankRound_persistent() "{{{
-  if g:yankround_dir=='' || g:_yankround_cache==[]
-    return
-  end
-  call writefile(g:_yankround_cache, s:yankround_dir. '/history')
 endfunction
 "}}}
 

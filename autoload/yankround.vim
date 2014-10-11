@@ -160,14 +160,15 @@ endfunction
 "=============================================================================
 "Main:
 function! yankround#init(keybind, ...) "{{{
+  let is_vmode = a:0
   if has_key(s:, 'rounder')
     call s:destroy_rounder()
   end
   if getregtype()!=''
-    let s:rounder = s:newRounder(a:keybind, a:0)
+    let s:rounder = s:newRounder(a:keybind, is_vmode)
   end
-  if !a:0 || v:register!='"'
-    return 'norm! '. (a:0 ? 'gv' : ''). '"'. v:register. v:count1. a:keybind
+  if !is_vmode || v:register!='"'
+    return 'norm! '. (is_vmode ? 'gv' : ''). '"'. v:register. v:count1. a:keybind
   end
   let @0 = @"
   return 'norm! gv"0'. v:count1. a:keybind
@@ -189,6 +190,7 @@ function! s:destroy_rounder() "{{{
     autocmd!
   aug END
   let g:_yankround_stop_caching = 0
+  doautocmd yankround CursorMoved
 endfunction
 "}}}
 
@@ -197,7 +199,6 @@ function! yankround#prev() "{{{
     return
   end
   call s:rounder.round_cache(1)
-  call YankRound_persistent()
   echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}
@@ -206,7 +207,6 @@ function! yankround#next() "{{{
     return
   end
   call s:rounder.round_cache(-1)
-  call YankRound_persistent()
   echo 'yankround:' yankround#get_roundstatus()
 endfunction
 "}}}
