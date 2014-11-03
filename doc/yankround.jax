@@ -99,7 +99,7 @@ g:yankround_max_history				*g:yankround_max_history*
 
 
 g:yankround_max_element_length		*g:yankround_max_element_length*
-	既定値: 1048576
+	既定値: 512000
 	文字列長がこれより長いレジスタの内容は記録されない。0にすると無効。
 
 
