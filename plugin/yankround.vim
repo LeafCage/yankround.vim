@@ -34,13 +34,24 @@ let g:_yankround_stop_caching = 0
 
 aug yankround
   autocmd!
-  autocmd CursorMoved *   call s:append_yankcache()
+  autocmd CursorMoved *   call Yankround_append()
   autocmd ColorScheme *   call s:define_region_hl()
   autocmd VimLeavePre *   call s:_persistent()
   autocmd CmdwinEnter *   call yankround#on_cmdwinenter()
   autocmd CmdwinLeave *   call yankround#on_cmdwinleave()
 aug END
-function! s:append_yankcache() "{{{
+
+function! s:define_region_hl() "{{{
+  if &bg=='dark'
+    highlight default YankRoundRegion   guibg=Brown ctermbg=Brown term=reverse
+  else
+    highlight default YankRoundRegion   guibg=LightRed ctermbg=LightRed term=reverse
+  end
+endfunction
+"}}}
+call s:define_region_hl()
+
+function! Yankround_append() "{{{
   call s:_reloadhistory()
   if g:_yankround_stop_caching || @" ==# substitute(get(g:_yankround_cache, 0, ''), '^.\d*\t', '', '') || @"=~'^.\?$'
     \ || g:yankround_max_element_length!=0 && strlen(@")>g:yankround_max_element_length
@@ -54,17 +65,6 @@ function! s:append_yankcache() "{{{
   call s:_persistent()
 endfunction
 "}}}
-
-function! s:define_region_hl() "{{{
-  if &bg=='dark'
-    highlight default YankRoundRegion   guibg=Brown ctermbg=Brown term=reverse
-  else
-    highlight default YankRoundRegion   guibg=LightRed ctermbg=LightRed term=reverse
-  end
-endfunction
-"}}}
-call s:define_region_hl()
-
 function! s:_persistent() "{{{
   if g:yankround_dir=='' || g:_yankround_cache==[]
     return

@@ -190,7 +190,7 @@ function! s:destroy_rounder() "{{{
     autocmd!
   aug END
   let g:_yankround_stop_caching = 0
-  doautocmd yankround CursorMoved
+  call Yankround_append()
 endfunction
 "}}}
 
