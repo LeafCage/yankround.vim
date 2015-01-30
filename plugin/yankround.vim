@@ -7,6 +7,7 @@ let g:yankround_max_history = get(g:, 'yankround_max_history', 30)
 let g:yankround_max_element_length = get(g:, 'yankround_max_element_length', 512000)
 let g:yankround_use_region_hl = get(g:, 'yankround_use_region_hl', 0)
 let g:yankround_region_hl_groupname = get(g:, 'yankround_region_hl_groupname', 'YankRoundRegion')
+let g:yankround_use_ctrlp = get(g:, 'yankround_use_ctrlp', 0)
 "======================================
 nnoremap <silent><Plug>(yankround-p)    :<C-u>exe yankround#init('p')<Bar>call yankround#activate()<CR>
 nnoremap <silent><Plug>(yankround-P)    :<C-u>exe yankround#init('P')<Bar>call yankround#activate()<CR>
@@ -18,6 +19,10 @@ xnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp', 'v')<Bar
 xmap <Plug>(yankround-gP)  <Plug>(yankround-gp)
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
+
+if g:yankround_use_ctrlp
+  command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
+end
 "=============================================================================
 
 let s:yankround_dir = expand(g:yankround_dir)

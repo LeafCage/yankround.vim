@@ -75,6 +75,7 @@ https://github.com/LeafCage/yankround.vim
 
 
 * ctrlp.vimによる履歴の閲覧 ~
+  この機能を使うには|g:yankround_use_ctrlp|を 非0 に定義しておきます。
   |:CtrlPYankRound|コマンドを実行してください。
   レジスタ履歴が一覧表示されます。履歴を選択後、
   - <CR>で、その履歴をカーソル位置に挿入します。
@@ -120,12 +121,17 @@ g:yankround_region_hl_groupname		*g:yankround_region_hl_groupname*
 	  autocmd ColorScheme * highlight YankRoundRegion guibg=Orange
 
 
+g:yankround_use_ctrlp			*g:yankround_use_ctrlp*
+	既定値: 0
+	非0 だと|:CtrlPYankRound|コマンドがVim起動時に定義される。
+
+
 ------------------------------------------------------------------------------
 コマンド					*yankround-commands*
 
 :CtrlPYankRound					*:CtrlPYankRound*
+	|g:yankround_use_ctrlp|が 非0 でないと定義されない。
 	|ctrlp.vim|のyankround拡張を呼ぶ。|yankround-usage|参照。
-	|ctrlp.vim|がインストールされていないと定義されない。
 
 
 ------------------------------------------------------------------------------
