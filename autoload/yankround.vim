@@ -3,14 +3,14 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:Rounder = {}
 function! s:newRounder(keybind, is_vmode) "{{{
-  let _ = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
+  let obj = {'keybind': a:keybind, 'count': v:count1, 'register': v:register, 'idx': -1, 'match_id': 0,
     \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime(), 'is_vmode': a:is_vmode}
-  if !_.in_cmdwin && undotree().seq_last!=0
-    let _.undofilepath = expand(g:yankround_dir).'/save_undo'
-    exe 'wundo!' _.undofilepath
+  if !obj.in_cmdwin && undotree().seq_last!=0
+    let obj.undofilepath = expand(g:yankround_dir).'/save_undo'
+    exe 'wundo!' obj.undofilepath
   end
-  call extend(_, s:Rounder)
-  return _
+  call extend(obj, s:Rounder)
+  return obj
 endfunction
 "}}}
 function! s:Rounder.activate() "{{{
@@ -48,20 +48,20 @@ function! s:Rounder.is_cursormoved() "{{{
 endfunction
 "}}}
 function! s:Rounder.is_valid() "{{{
-  if get(self, 'cachelen', 1) != 0 && has_key(self, 'changedtick') && self.changedtick==b:changedtick
+  if get(self, '_cachelen', 1) != 0 && has_key(self, 'changedtick') && self.changedtick==b:changedtick
     return 1
   end
   call s:destroy_rounder()
 endfunction
 "}}}
 
-function! s:Rounder.round_cache(incdec) "{{{
-  let self.cachelen = len(g:_yankround_cache)
+function! s:Rounder.round_cache(delta) "{{{
+  let self._cachelen = len(g:_yankround_cache)
   if !self.is_valid()
     return
   end
   let g:_yankround_stop_caching = 1
-  let self.idx = self._round_idx(a:incdec)
+  let self.idx = self._round_idx(a:delta)
   let [str, regtype] = yankround#_get_cache_and_regtype(self.idx)
   call setreg('"', str, regtype)
   silent undo
@@ -79,7 +79,7 @@ function! s:Rounder.round_cache(incdec) "{{{
   call self.update_changedtick()
 endfunction
 "}}}
-function! s:Rounder._round_idx(incdec) "{{{
+function! s:Rounder._round_idx(delta) "{{{
   if self.idx==-1
     if @"!=yankround#_get_cache_and_regtype(0)[0] || self.register!='"'
       return 0
@@ -87,8 +87,8 @@ function! s:Rounder._round_idx(incdec) "{{{
       let self.idx = self.is_vmode ? 1 : 0
     end
   end
-  let self.idx += a:incdec
-  return self.idx>=self.cachelen ? 0 : self.idx<0 ? self.cachelen-1 : self.idx
+  let self.idx += a:delta
+  return self.idx>=self._cachelen ? 0 : self.idx<0 ? self._cachelen-1 : self.idx
 endfunction
 "}}}
 function! s:Rounder._rest_undotree() "{{{
@@ -216,7 +216,7 @@ function! yankround#is_active() "{{{
 endfunction
 "}}}
 function! yankround#get_roundstatus() "{{{
-  return has_key(s:, 'rounder') ? '('. (s:rounder.idx+1). '/'. s:rounder.cachelen. ')' : ''
+  return has_key(s:, 'rounder') ? '('. (s:rounder.idx+1). '/'. s:rounder._cachelen. ')' : ''
 endfunction
 "}}}
 
