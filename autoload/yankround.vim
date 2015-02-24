@@ -156,6 +156,54 @@ function! s:_caught_win_anchor(anchortime) "{{{
 endfunction
 "}}}
 
+let s:BaseCmdline = {}
+function! s:newBaseCmdline() "{{{
+  let obj = copy(s:BaseCmdline)
+  let obj.idx = -1
+  let obj.pos = getpos('.')
+  let obj.line = getcmdline()
+  let cursor = getcmdpos()-1
+  let obj.head = obj.line[:cursor-1]
+  let obj.tail = obj.line[cursor :]
+  return obj
+endfunction
+"}}}
+function! s:BaseCmdline.is_identical(context) "{{{
+  return self.pos==getpos('.') && stridx(a:context.line, self.head)==0 && a:context.line[a:context.cursor :]==self.tail
+endfunction
+"}}}
+function! s:BaseCmdline.get_popstr(context, delta) "{{{
+  let self._cachelen = len(g:_yankround_cache)
+  if self._cachelen==0
+    return ''
+  elseif self.idx==-1
+    let self.idx = 0
+    let self.origin = a:context.line[len(self.head)-1 : a:context.cursor-1]
+    let str = self._get_yankcache()
+    if str !=# self.origin
+      return str
+    end
+  end
+  let self.idx += a:delta
+  let self.idx = self.idx>self._cachelen ? 0 : self.idx<0 ? self._cachelen : self.idx
+  return self._get_yankcache()
+endfunction
+"}}}
+function! s:BaseCmdline.replace_cmdline(str) "{{{
+  let upper = self.head. a:str
+  call setcmdpos(len(upper) +1)
+  return upper. self.tail
+endfunction
+"}}}
+function! s:BaseCmdline._get_yankcache() "{{{
+  if self.idx==self._cachelen
+    return self.origin
+  end
+  let [str, regtype] = yankround#_get_cache_and_regtype(self.idx)
+  return substitute(substitute(str, '\%(^\|\n\)\@<=\s*\n\|\n$', '', 'g'), '\n', '| ', 'g')
+endfunction
+"}}}
+
 
 "=============================================================================
 "Main:
@@ -217,6 +265,32 @@ endfunction
 "}}}
 function! yankround#get_roundstatus() "{{{
   return has_key(s:, 'rounder') ? '('. (s:rounder.idx+1). '/'. s:rounder._cachelen. ')' : ''
+endfunction
+"}}}
+
+"--------------------------------------
+function! yankround#is_cmdline_popable() "{{{
+  let context = {'line': getcmdline(), 'cursor': getcmdpos()-1}
+  let ret = exists('s:basecmdline') && s:basecmdline.is_identical(context)
+  if !ret
+    unlet! s:basecmdline
+  end
+  return ret
+endfunction
+"}}}
+function! yankround#cmdline_base() "{{{
+  let s:basecmdline = s:newBaseCmdline()
+  return s:basecmdline.line
+endfunction
+"}}}
+function! yankround#cmdline_pop(delta) "{{{
+  let context = {'line': getcmdline(), 'cursor': getcmdpos()-1}
+  if !(exists('s:basecmdline') && s:basecmdline.is_identical(context))
+    unlet! s:basecmdline
+    return context.line
+  end
+  let str = s:basecmdline.get_popstr(context, a:delta)
+  return str=='' ? context.line : s:basecmdline.replace_cmdline(str)
 endfunction
 "}}}
 

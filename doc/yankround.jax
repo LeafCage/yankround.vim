@@ -83,6 +83,18 @@ https://github.com/LeafCage/yankround.vim
   - <C-t>で、その履歴を履歴から削除します。
 
 
+* コマンドライン内での利用 ~
+  以下のようにマッピングを定義すると、コマンドライン内で<C-r>を使って挿入した
+  文字列を<C-y>で1つ前のレジスタの内容に置き換えることができます。 >
+	cmap <C-r> <Plug>(yankround-insert-register)
+	cmap <C-y> <Plug>(yankround-pop)
+
+< 以下のようにするとEmacsライクに<C-y>で無名レジスタ挿入、<M-y>で置き換えとい
+  う挙動になります。 >
+	cmap <C-y> <Plug>(yankround-insert-register)"
+	cmap <M-y> <Plug>(yankround-pop)
+
+
 ==============================================================================
 インターフェイス				*yankround-interface*
 
@@ -187,6 +199,26 @@ g:ctrlp_available				*g:ctrlp_available*
 	カーソルを動かすまで有効である。
 
 
+<Plug>(yankround-insert-register)	*<Plug>(yankround-insert-register)*
+	有効モード: コマンドライン
+	|c_<C-r>|とほぼ同じ挙動をする。|c_<C-r>|をタイプしたときと同じように
+	Vimはあなたがレジスタ名を入力するのを待つ。
+	これの直後は|<Plug>(yankround-pop)| |<Plug>(yankround-backpop)|による
+	挿入文字列の置き換えが有効になる。
+
+
+<Plug>(yankround-pop)				*<Plug>(yankround-pop)*
+	有効モード: コマンドライン
+	|<Plug>(yankround-insert-register)|で挿入した文字列を1つ前の無名レジス
+	タの内容に置き換える。
+
+
+<Plug>(yankround-backpop)			*<Plug>(yankround-backpop)*
+	有効モード: コマンドライン
+	|<Plug>(yankround-insert-register)|で挿入した文字列を1つ後の無名レジス
+	タの内容に置き換える。
+
+
 ------------------------------------------------------------------------------
 関数						*yankround-functions*
 
@@ -198,6 +230,11 @@ yankround#is_active()				*yankround#is_active*
 	例: yankroundが有効でないときには<C-p>で|ctrlp.vim|を呼ぶ。 >
  nnoremap <silent><SID>(ctrlp) :<C-u>CtrlP<CR>
  nmap <expr><C-p> yankround#is_active() ? "\<Plug>(yankround-prev)" : "<SID>(ctrlp)"
+
+
+yankround#is_cmdline_popable()		*yankround#is_cmdline_popable()*
+	|<Plug>(yankround-pop)| |<Plug>(yankround-backpop)|が有効なら 1 そうで
+	なければ 0 を返す。
 
 
 ==============================================================================
