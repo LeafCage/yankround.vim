@@ -22,7 +22,7 @@ cnoremap <Plug>(yankround-insert-register)   <C-\>eyankround#cmdline_base()<CR><
 cnoremap <Plug>(yankround-pop)    <C-\>eyankround#cmdline_pop(1)<CR>
 cnoremap <Plug>(yankround-backpop)   <C-\>eyankround#cmdline_pop(-1)<CR>
 
-if get(g:, 'ctrlp_abailable')
+if get(g:, 'ctrlp_available')
   command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
 end
 "=============================================================================
