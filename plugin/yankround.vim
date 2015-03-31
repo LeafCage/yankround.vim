@@ -22,9 +22,11 @@ cnoremap <Plug>(yankround-insert-register)   <C-\>eyankround#cmdline_base()<CR><
 cnoremap <Plug>(yankround-pop)    <C-\>eyankround#cmdline_pop(1)<CR>
 cnoremap <Plug>(yankround-backpop)   <C-\>eyankround#cmdline_pop(-1)<CR>
 
-if get(g:, 'ctrlp_abailable')
-  command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id())
-end
+augroup yankroundCtrlP
+  autocmd!
+  autocmd VimEnter * if exists(':CtrlP') | command! -nargs=0   CtrlPYankRound    call ctrlp#init(ctrlp#yankround#id()) | endif
+augroup END
+
 "=============================================================================
 
 let s:yankround_dir = expand(g:yankround_dir)
