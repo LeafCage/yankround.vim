@@ -7,7 +7,7 @@ function! s:newRounder(keybind, is_vmode) "{{{
     \ 'in_cmdwin': bufname('%')==#'[Command Line]', 'anchortime': localtime(), 'is_vmode': a:is_vmode}
   if !obj.in_cmdwin && undotree().seq_last!=0
     let obj.undofilepath = expand(g:yankround_dir).'/save_undo'
-    exe 'wundo!' obj.undofilepath
+    exe 'wundo!' fnameescape(obj.undofilepath)
   end
   call extend(obj, s:Rounder)
   return obj
@@ -95,7 +95,7 @@ function! s:Rounder._rest_undotree() "{{{
   if self.in_cmdwin
     return
   elseif has_key(self, 'undofilepath')
-    silent exe 'rundo' self.undofilepath
+    silent exe 'rundo' fnameescape(self.undofilepath)
     return
   end
   let save_ul = &undolevels
