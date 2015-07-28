@@ -18,7 +18,7 @@ xnoremap <silent><Plug>(yankround-gp)    :<C-u>exe yankround#init('gp', 'v')<Bar
 xmap <Plug>(yankround-gP)  <Plug>(yankround-gp)
 nnoremap <silent><Plug>(yankround-prev)    :<C-u>call yankround#prev()<CR>
 nnoremap <silent><Plug>(yankround-next)    :<C-u>call yankround#next()<CR>
-cnoremap <Plug>(yankround-insert-register)   <C-\>eyankround#cmdline_base()<CR><C-r>
+cnoremap <expr><Plug>(yankround-insert-register)   getcmdline()=="" ? "\<C-r>" : "\<C-\>eyankround#cmdline_base()\<CR>\<C-r>"
 cnoremap <Plug>(yankround-pop)    <C-\>eyankround#cmdline_pop(1)<CR>
 cnoremap <Plug>(yankround-backpop)   <C-\>eyankround#cmdline_pop(-1)<CR>
 
