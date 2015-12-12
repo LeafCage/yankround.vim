@@ -19,6 +19,9 @@ function! ctrlp#yankround#init() "{{{
 endfunction
 "}}}
 function! ctrlp#yankround#accept(action, str) "{{{
+  if a:action=='t'
+    return
+  end
   call ctrlp#exit()
   let str = a:str
   let strlist = map(copy(g:_yankround_cache), 's:_cache_to_ctrlpline(v:val)')
@@ -26,9 +29,9 @@ function! ctrlp#yankround#accept(action, str) "{{{
   let [str, regtype] = yankround#_get_cache_and_regtype(idx)
   call setreg('"', str, regtype)
   if a:action=='e'
-    exe 'norm! p'
-  elseif a:action=='t'
     exe 'norm! P'
+  elseif a:action=='v'
+    exe 'norm! p'
   end
 endfunction
 "}}}
