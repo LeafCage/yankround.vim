@@ -3,7 +3,7 @@ let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:CTRLP_BUILTINS = ctrlp#getvar('g:ctrlp_builtins')
 "======================================
-let s:ctrlp_yankround_var = {'lname': 'yankround', 'sname': 'ynkrd', 'typs': 'tabe', 'sort': 0, 'nolim': 1, 'opmul': 1}
+let s:ctrlp_yankround_var = {'lname': 'yankround', 'sname': 'ykrd', 'type': 'tabe', 'sort': 0, 'nolim': 1, 'opmul': 1}
 let s:ctrlp_yankround_var.init = 'ctrlp#yankround#init()'
 let s:ctrlp_yankround_var.accept = 'ctrlp#yankround#accept'
 let s:ctrlp_yankround_var.wipe = 'ctrlp#yankround#wipe'
