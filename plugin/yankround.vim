@@ -38,7 +38,7 @@ let g:_yankround_stop_caching = 0
 
 aug yankround
   autocmd!
-  if has('patch-8.0.1394')
+  if exists('##TextYankPost')
     autocmd TextYankPost *   call Yankround_append()
   endif
   autocmd CursorMoved *   call Yankround_append()
