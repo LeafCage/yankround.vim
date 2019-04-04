@@ -50,7 +50,7 @@ unlet s:CTRLP_BUILTINS
 "======================================
 function! s:_cache_to_ctrlpline(str) "{{{
   let entry = matchlist(a:str, "^\\(.\\d*\\)\t\\(.*\\)")
-  return s:_change_regmodechar(entry[1]). "\t". strtrans(entry[2])
+  return strtrans(entry[2])
 endfunction
 "}}}
 function! s:_change_regmodechar(char) "{{{
