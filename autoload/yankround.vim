@@ -259,6 +259,11 @@ function! yankround#next() "{{{
 endfunction
 "}}}
 
+function! yankround#inactivate() abort
+  if has_key(s:, 'rounder')
+    call s:destroy_rounder()
+  endif
+endfunction
 function! yankround#is_active() "{{{
   return has_key(s:, 'rounder') && s:rounder.is_valid()
 endfunction
