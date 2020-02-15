@@ -53,10 +53,6 @@ function! s:_cache_to_ctrlpline(str) "{{{
   return strtrans(entry[2])
 endfunction
 "}}}
-function! s:_change_regmodechar(char) "{{{
-  return a:char==#'v' ? 'c' : a:char==#'V' ? 'l' : a:char
-endfunction
-"}}}
 
 "=============================================================================
 "END "{{{1
